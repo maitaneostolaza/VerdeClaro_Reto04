@@ -42,6 +42,7 @@ min(recommenderlab::rowCounts(matriz_rec,na.rm=T))
 
 ######################### RECOMENDADORES CON RECOMMENDERLAB ####################
 set.seed(8)
+pak
 # --------------------------- TRAIN Y TEST
 eval_scheme <- evaluationScheme(matriz_rec, method = "split",
                                 train = 0.8, given= 1,
