@@ -23,18 +23,6 @@ cantidad_productos <- cantidad_productos %>%
   group_by(id_cliente_enc) %>% 
   summarise(media_unidades_por_compra = round(mean(cantidad_productos),0))
 
-# ----------------------- COMPRAS POR MES
-cantidad_mensual <- tickets %>%
-  select(id_cliente_enc, dia,num_ticket) %>%
-  distinct() %>%  # Nos quedamos con un registro por cliente y día
-  group_by(id_cliente_enc,month(dia)) %>%
-  mutate(cantidad_mensual=n())
-
-# sin que nos importe el mes
-cantidad_mensual <- cantidad_mensual %>% 
-  group_by(id_cliente_enc) %>% 
-  summarise(compras_por_mes= round(mean(cantidad_mensual),0))
-
 # ------------------------- CANTIDAD DE VECES QUE HA COMPRADO
 media_veces_compra <- tickets %>% 
   group_by(id_cliente_enc) %>% 

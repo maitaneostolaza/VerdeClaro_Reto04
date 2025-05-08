@@ -3,6 +3,7 @@ library(dplyr)
 library(tidyr)
 library(rsparse)
 library(ggplot2)
+library(Matrix)
 
 # cargamos los datos
 tickets <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
@@ -21,8 +22,9 @@ objetivo2 <- as.data.frame(objetivos[[2]])
 matriz_general <- readRDS("Datos\\Resultados\\Matriz.rds")
 rownames(matriz_general) <- matriz_general$id_cliente_enc
 matriz_general <- matriz_general[,-1]
-matriz_rec <- as.matrix(matriz_general)
-matriz_rec <- as(matriz_rec,"realRatingMatrix")
+matriz_general <- as.matrix(matriz_general)
+
+matriz_rec <- as(matriz_general,"realRatingMatrix")
 
 # --------------------- ESTADÍSTICOS DE LA MATRIZ
 matriz <- as(matriz_general,"matrix")
@@ -42,7 +44,6 @@ min(recommenderlab::rowCounts(matriz_rec,na.rm=T))
 
 ######################### RECOMENDADORES CON RECOMMENDERLAB ####################
 set.seed(8)
-pak
 # --------------------------- TRAIN Y TEST
 eval_scheme <- evaluationScheme(matriz_rec, method = "split",
                                 train = 0.8, given= 1,
@@ -61,17 +62,12 @@ algos <- list("random" = list(name = "RANDOM", param = NULL),
 # ----------- TOPNLIST
 eval <- evaluate(eval_scheme, algos, type = "topNList", n = c(1,3,5,10,15,20))
 plot(eval)
-ggsave("Graficos/Comparacion_algoritmos_evaluate.png", 
-       plot = grafico_eval, width = 10, height = 6, dpi = 300)
+
 
 getConfusionMatrix(eval[["random"]])
 grafico2 <- plot(eval[-c(2, 3)]) 
 grafico4 <- plot(eval,"prec/rec")
-ggsave("Graficos/Comparacion_algoritmos_evaluate2.png", 
-       plot = grafico2, width = 10, height = 6, dpi = 300)
 
-ggsave("Graficos/Comparacion_algoritmos_evaluate3.png", 
-       plot = grafico4, width = 10, height = 6, dpi = 300)
 
 CM_Random <- getConfusionMatrix(eval[["random"]])[[1]]
 CM_UBCF_10 <- getConfusionMatrix(eval[["UBCF_10nn"]])[[1]]
@@ -95,80 +91,57 @@ avg(eval_ratings[["svdf_100"]])
 avg(eval_ratings[["svdf_200"]])
 
 
-# ---------------------- ALS
-model_als <- WRMF$new(rank = 10, lambda = 0.1, feedback = "explicit")
 
-model_als$fit(x = matriz_ui, n_iter = 10)
+############################### RSPARSE ########################################
+matriz_general <- readRDS("Datos\\Resultados\\Matriz.rds")
+rownames(matriz_general) <- matriz_general[,1]
+matriz_general <- matriz_general[,-c(1)]
 
-# Predicción de ratings para toda la matriz usuario-item
-pred <- model_als$predict(matriz_ui)
+# ------------ cambiamos los NA's por 0
+matriz_general <- as(matriz_general, "matrix")
+matriz_general[is.na(matriz_general)] <- 0
 
-# Top-3 recomendaciones por usuario
-top3 <- model_als$top_n(matriz_ui, n = 3)
+saveRDS(matriz_general,"Datos\\Resultados\\Matriz_sinNA.rds")
 
-# Ver para un usuario
-top3[[1]]  # ítems recomendados para el usuario 1
+############################### OBJETIVO 1 #####################################
+# Creamos el modelo WRMF -------------------------------------------------------
+matriz_general <- readRDS("Datos\\Resultados\\Matriz_sinNA.rds")
+storage.mode(matriz_general) <- "numeric"
+
+# para el objetivo 1 y 3 cambiamos filas por columnas
+matriz_alreves <- t(matriz_general)
+
+# -- MODELO: 
+modelo_wrmf_alreves <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
+modelo_wrmf_alreves$fit_transform(matriz_alreves, n_iter = 1000L, convergence_tol=0.000001)
+
+# para el objetivo 1 filtramos por el producto que nos interesa --> masa de pizza
+
+matriz_obj1 <- matriz_alreves[rownames(matriz_alreves) %in% objetivos$objetivo1$obj, , drop=F] 
+matriz_obj1 <- as(matriz_obj1,"sparseMatrix")
+
+preds_1 <- modelo_wrmf_alreves$predict(matriz_obj1, k = 10) # para que nos de 10 usuarios
+preds_1
+lista_1 <- attr(preds_1,'ids')
 
 
-# Supongamos que el producto es "itemX"
-producto <- objetivo1[,2]
+################################## OBJETIVO 2 ##################################
+# modelo para el objetivo 2 y 4: 
+modelo_wrmf <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
+modelo_wrmf$fit_transform(matriz_general, n_iter = 1000L, convergence_tol=0.000001)
 
-# Obtener los usuarios con mayor predicción para ese producto
-scores <- pred_matrix[, producto]
-top10_clientes <- names(sort(scores, decreasing = TRUE))[1:10]
+matriz_obj2 <- matriz_general[rownames(matriz_general) %in% objetivo2$obj,]
+matriz_obj2 <- as(matriz_obj2,"sparseMatrix")
 
+preds_2 <- modelo_wrmf$predict(matriz_obj2, k = 1)
+preds_2
+lista_2 <- attr(preds_2,'ids')
 
+################################# OBJETIVO 3 ###################################
+# el modelo es el mismo que para el objetivo 1 
+matriz_obj3 <- matriz_alreves[rownames(matriz_alreves) %in% objetivos$objetivo3$obj,]
+matriz_obj3 <- as(matriz_obj3,"sparseMatrix")
 
-# ----------- EVAL SCHEME DE NUEVO
-set.seed(7)
-train<- evaluationScheme(matriz_rec, method= "split",
-                         train= 0.8, 
-                         k=1,
-                         given=15, goodRating=2)
-
-paraentrenar<- getData(train, "train") #se valoraran las predicciones respecto a estas
-as(getData(train, "unknown"), "matrix")
-
-paradar<- getData(train, "known") #se le dan estas
-as(getData(train, "known"),"matrix")
-
-parapredecir<-getData(train, "unknown") # se valoran las predicciones respecto a estas
-as(getData(train, "unknown"),"matrix")
-
-# entrenar modelos : Recommender (1 solo algortimo);
-#                     evaluate (multiples algoritmos)
-#                     parametrizar algoritmos
-
-# Lista de algoritmos a evaluar
-algos <- list("random" = list(name = "RANDOM", param = NULL),
-              "UBCF" = list(name = "UBCF"),
-              "IBCF" = list(name = "IBCF"),
-              "POPULAR" = list(name = "POPULAR", param = NULL))
-#vamos a evaluar los algoritmos pero
-#ahora solicitamos los articulos topn en lugar de una estimacion de las valoraciones
-#Se evaluarán los algoritmos para n = 1,3,5,10,15,20.
-#La función eval entrena los algoritmos, #predice y entrega la evaluación para todos los algoritmos
-
-eval <- evaluate(train, algos, type = "ratings")
-plot(eval);plot(eval,"prec/rec") 
-getConfusionMatrix(eval[["random"]])
-getConfusionMatrix(eval[["IBCF"]])
-
-# Evaluar usando top-N
-results <- evaluate(train, method = algos, type = "topNList", n = c(1, 3, 5, 10))
-
-plot(results)
-usuarios <-  c(
-  "b51353fcf07cb61280eda45e33679871",
-  "02ff5edaa057b63ea0a0010c5402205c",
-  "25d259d32a2bc254343715f2e347c518",
-  "53ffb83e85fd51cf1ec2fdef3c78b4fd",
-  "26f424b3bba6aaf97952ac599ed39f75",
-  "32cc820ac27ff143c3ea976f3fe69d34",
-  "a57938025d714b65612bf2cfde12136d",
-  "af30d404e282749ccd5f5ad0c8e834c7",
-  "8b9aa623b654a8be21b316a5fdf41007",
-  "e27ceb0a1576648212c4325fdf7d8002"
-)
-com <- df %>% filter(id_cliente_enc %in% usuarios)
-u <- unique(com$id_cliente_enc)
+preds_3 <- modelo_wrmf_alreves$predict(matriz_obj3, k = 1)
+preds_3
+lista_3 <- attr(preds_3,'ids')
