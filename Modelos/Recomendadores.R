@@ -130,18 +130,22 @@ lista_1 <- attr(preds_1,'ids')
 modelo_wrmf <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
 modelo_wrmf$fit_transform(matriz_general, n_iter = 1000L, convergence_tol=0.000001)
 
-matriz_obj2 <- matriz_general[rownames(matriz_general) %in% objetivo2$obj,]
+matriz_obj2 <- matriz_general[rownames(matriz_general) %in% objetivos$objetivo2$obj,]
 matriz_obj2 <- as(matriz_obj2,"sparseMatrix")
 
-preds_2 <- modelo_wrmf$predict(matriz_obj2, k = 1)
+preds_2 <- modelo_wrmf$predict(matriz_obj2, k = 1, not_recommend = matriz_obj2)
 preds_2
 lista_2 <- attr(preds_2,'ids')
 
 ################################# OBJETIVO 3 ###################################
 # el modelo es el mismo que para el objetivo 1 
-matriz_obj3 <- matriz_alreves[rownames(matriz_alreves) %in% objetivos$objetivo3$obj,]
+matriz_obj3 <- matriz_general
 matriz_obj3 <- as(matriz_obj3,"sparseMatrix")
 
-preds_3 <- modelo_wrmf_alreves$predict(matriz_obj3, k = 1)
+# cogemos los items que no queremos que recomiente para el predict
+matriz_no_recomendados <- matriz_general [,!colnames(matriz_general) %in% objetivos$objetivo3$obj]
+items_no_recomendados <- colnames(matriz_no_recomendados)
+
+preds_3 <- modelo_wrmf$predict(matriz_obj3, k = 1, items_exclude = items_no_recomendados)
 preds_3
 lista_3 <- attr(preds_3,'ids')
