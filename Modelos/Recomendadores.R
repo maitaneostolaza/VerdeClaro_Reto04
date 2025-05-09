@@ -4,6 +4,8 @@ library(tidyr)
 library(rsparse)
 library(ggplot2)
 library(Matrix)
+library(stringr)
+library(tibble)
 
 # cargamos los datos
 tickets <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
@@ -124,6 +126,9 @@ preds_1 <- modelo_wrmf_alreves$predict(matriz_obj1, k = 10) # para que nos de 10
 preds_1
 lista_1 <- attr(preds_1,'ids')
 
+# guardamos el df en resultados
+objretivo1_resultado <- as.data.frame(lista_1)
+saveRDS(objretivo1_resultado, "Datos\\Resultados\\Objetivo1_resultado.rds")
 
 ################################## OBJETIVO 2 ##################################
 # modelo para el objetivo 2 y 4: 
@@ -137,6 +142,14 @@ preds_2 <- modelo_wrmf$predict(matriz_obj2, k = 1, not_recommend = matriz_obj2)
 preds_2
 lista_2 <- attr(preds_2,'ids')
 
+# guardamos en un data frame
+objetivo2_resultado <- as.data.frame(lista_2)
+colnames(objetivo2_resultado) <- "cod_est"
+objetivo2_resultado <- rownames_to_column(objetivo2_resultado, var = "Id_cliente")
+objetivo2_resultado <- inner_join(objetivo2_resultado,productos,by="cod_est")
+
+saveRDS(objetivo2_resultado,"Datos\\Resultados\\Objetivo2_resultado.rds")
+
 ################################# OBJETIVO 3 ###################################
 # el modelo es el mismo que para el objetivo 1 
 matriz_obj3 <- matriz_general
@@ -144,8 +157,69 @@ matriz_obj3 <- as(matriz_obj3,"sparseMatrix")
 
 # cogemos los items que no queremos que recomiente para el predict
 matriz_no_recomendados <- matriz_general [,!colnames(matriz_general) %in% objetivos$objetivo3$obj]
+
 items_no_recomendados <- colnames(matriz_no_recomendados)
 
 preds_3 <- modelo_wrmf$predict(matriz_obj3, k = 1, items_exclude = items_no_recomendados)
 preds_3
+
 lista_3 <- attr(preds_3,'ids')
+
+# guardamos en un data frame con el nombre del producto
+objetivo3_resultado <- as.data.frame(lista_3)
+colnames(objetivo3_resultado) <- "cod_est"
+objetivo3_resultado <- rownames_to_column(objetivo3_resultado, var = "Id_cliente")
+objetivo3_resultado <- inner_join(objetivo3_resultado,productos,by="cod_est")
+
+saveRDS(objetivo3_resultado,"Datos\\Resultados\\Objetivo3_resultado.rds")
+
+################################# OBJETIVO 4 ###################################
+obj4<-objetivos[[4]]$obj
+
+tickets_filtrados <- tickets[tickets$id_cliente_enc %in% obj4, ]
+
+ultimos_tickets <- tickets_filtrados %>%
+  group_by(id_cliente_enc) %>%
+  filter(dia == max(dia)) %>%
+  ungroup()
+
+historial_tickets <- anti_join(tickets_filtrados, ultimos_tickets, by = "num_ticket")
+
+
+tickets_matriz_agrupado <- historial_tickets %>%
+  group_by(id_cliente_enc, cod_est) %>%
+  summarise(N_compras = n(), .groups = "drop")
+
+df_matriz <- pivot_wider(
+  tickets_matriz_agrupado, 
+  names_from = "cod_est", 
+  values_from = "N_compras", 
+  values_fill = 0,
+  names_prefix = "id_"
+)
+
+matriz_sparse_o4 <- as(as.matrix(df_matriz[,-1]), "dgCMatrix")
+rownames(matriz_sparse_o4) <- df_matriz$id_cliente_enc
+
+
+modelo_wrmf_o4 <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
+modelo_wrmf_o4$fit_transform(matriz_sparse_o4, n_iter = 1000L, convergence_tol = 1e-6)
+
+preds_o4 <- modelo_wrmf_o4$predict(matriz_sparse_o4, k = 1)
+
+clientes <- rownames(matriz_sparse_o4)
+productos_predichos <- attr(preds_o4, "ids")
+
+recomendaciones_o4 <- data.frame(
+  id_cliente_enc = clientes,
+  producto_olvidado = productos_predichos
+)
+
+recomendaciones_o4 <- recomendaciones_o4 %>%
+  mutate(cod_est = str_remove(producto_olvidado, "id_")) %>%
+  left_join(productos %>% select(cod_est, descripcion), by = "cod_est") %>%
+  select(id_cliente_enc, cod_est, descripcion)
+
+# guardamos el df
+saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
+
