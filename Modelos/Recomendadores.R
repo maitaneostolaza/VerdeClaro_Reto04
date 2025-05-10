@@ -5,7 +5,7 @@ library(rsparse)
 library(ggplot2)
 library(Matrix)
 library(stringr)
-
+library(tibble)
 
 # cargamos los datos
 tickets <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
@@ -126,6 +126,9 @@ preds_1 <- modelo_wrmf_alreves$predict(matriz_obj1, k = 10) # para que nos de 10
 preds_1
 lista_1 <- attr(preds_1,'ids')
 
+# guardamos el df en resultados
+objretivo1_resultado <- as.data.frame(lista_1)
+saveRDS(objretivo1_resultado, "Datos\\Resultados\\Objetivo1_resultado.rds")
 
 ################################## OBJETIVO 2 ##################################
 # modelo para el objetivo 2 y 4: 
@@ -138,6 +141,14 @@ matriz_obj2 <- as(matriz_obj2,"sparseMatrix")
 preds_2 <- modelo_wrmf$predict(matriz_obj2, k = 1, not_recommend = matriz_obj2)
 preds_2
 lista_2 <- attr(preds_2,'ids')
+
+# guardamos en un data frame
+objetivo2_resultado <- as.data.frame(lista_2)
+colnames(objetivo2_resultado) <- "cod_est"
+objetivo2_resultado <- rownames_to_column(objetivo2_resultado, var = "Id_cliente")
+objetivo2_resultado <- inner_join(objetivo2_resultado,productos,by="cod_est")
+
+saveRDS(objetivo2_resultado,"Datos\\Resultados\\Objetivo2_resultado.rds")
 
 ################################# OBJETIVO 3 ###################################
 # el modelo es el mismo que para el objetivo 1 
@@ -154,6 +165,13 @@ preds_3
 
 lista_3 <- attr(preds_3,'ids')
 
+# guardamos en un data frame con el nombre del producto
+objetivo3_resultado <- as.data.frame(lista_3)
+colnames(objetivo3_resultado) <- "cod_est"
+objetivo3_resultado <- rownames_to_column(objetivo3_resultado, var = "Id_cliente")
+objetivo3_resultado <- inner_join(objetivo3_resultado,productos,by="cod_est")
+
+saveRDS(objetivo3_resultado,"Datos\\Resultados\\Objetivo3_resultado.rds")
 
 ################################# OBJETIVO 4 ###################################
 obj4<-objetivos[[4]]$obj
@@ -201,4 +219,7 @@ recomendaciones_o4 <- recomendaciones_o4 %>%
   mutate(cod_est = str_remove(producto_olvidado, "id_")) %>%
   left_join(productos %>% select(cod_est, descripcion), by = "cod_est") %>%
   select(id_cliente_enc, cod_est, descripcion)
+
+# guardamos el df
+saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
 
