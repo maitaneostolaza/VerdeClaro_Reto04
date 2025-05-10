@@ -227,30 +227,3 @@ saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
 
 
 
-
-# 1. Filtramos tickets solo para los clientes objetivo
-# 2. Obtenemos la última fecha de compra por cliente
-ultimas_compras_df <- tickets %>%
-  filter(id_cliente_enc %in% obj4) %>%
-  group_by(id_cliente_enc) %>%
-  filter(dia == max(dia)) %>%
-  group_by(id_cliente_enc, cod_est) %>%
-  summarise(N_compras = n(), .groups = "drop") %>%
-  mutate(cod_est = str_c("id_", cod_est)) %>%
-  pivot_wider(names_from = cod_est, values_from = N_compras, values_fill = 0)
-
-# Aseguramos que todos los clientes objetivo estén como filas, incluso si no tienen compras
-mo4 <- ultimas_compras_df %>%
-  right_join(data.frame(id_cliente_enc = obj4), by = "id_cliente_enc") %>%
-  replace(is.na(.), 0) %>%
-  column_to_rownames("id_cliente_enc") %>%
-  as.matrix()
-
-# Igualamos columnas a las del modelo original (en orden), rellenando con ceros si falta alguna
-faltan_cols <- setdiff(colnames(matriz), colnames(mo4))
-sobran_cols <- setdiff(colnames(mo4), colnames(matriz))
-
-mo4 <- mo4[, setdiff(colnames(mo4), sobran_cols), drop = FALSE]
-mo4 <- cbind(mo4, matrix(0, nrow = nrow(mo4), ncol = length(faltan_cols),
-                         dimnames = list(rownames(mo4), faltan_cols)))
-mo4 <- mo4[, colnames(matriz)]
