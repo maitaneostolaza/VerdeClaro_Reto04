@@ -128,6 +128,7 @@ lista_1 <- attr(preds_1,'ids')
 
 # guardamos el df en resultados
 objretivo1_resultado <- as.data.frame(lista_1)
+rownames(objretivo1_resultado)<- c("MASAS DE PIZZA")
 saveRDS(objretivo1_resultado, "Datos\\Resultados\\Objetivo1_resultado.rds")
 
 ################################## OBJETIVO 2 ##################################
