@@ -110,7 +110,7 @@ saveRDS(matriz_general,"Datos\\Resultados\\Matriz_sinNA.rds")
 matriz_general <- readRDS("Datos\\Resultados\\Matriz_sinNA.rds")
 storage.mode(matriz_general) <- "numeric"
 
-# para el objetivo 1 y 3 cambiamos filas por columnas
+# para el objetivo 1 cambiamos filas por columnas
 matriz_alreves <- t(matriz_general)
 
 # -- MODELO: 
