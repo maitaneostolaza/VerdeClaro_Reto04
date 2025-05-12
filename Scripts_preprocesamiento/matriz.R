@@ -207,6 +207,7 @@ general <- df %>%
   group_by(id_cliente_enc,cod_est) %>% 
   summarise(Cantidad = n())
 
+
 matriz_general <- pivot_wider(general,
                               names_from = cod_est,
                               values_from = Cantidad)
