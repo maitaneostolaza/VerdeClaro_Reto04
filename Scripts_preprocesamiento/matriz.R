@@ -163,6 +163,7 @@ producto_mas_comprado <- df %>%
 producto_mas_comprado <- producto_mas_comprado %>% 
   select(id_cliente_enc,producto_general)
 
+############################### CREACION MATRIZ ################################
 # VAMOS A HACER UNA MATRIZ POR CLUSTER PARA QUE LAS RECOMENDACIONES SEAN MÁS ESPECIFICAS
 str(df)
 cluster1 <- df %>%
@@ -201,11 +202,28 @@ matriz4 <- pivot_wider(cluster4,
                        values_from = Cantidad)
 
 
+# --------------------------------- MATRIZ CON TODOS LOS DATOS
 general <- df %>% 
   group_by(id_cliente_enc,cod_est) %>% 
   summarise(Cantidad = n())
 
+
 matriz_general <- pivot_wider(general,
                               names_from = cod_est,
                               values_from = Cantidad)
+
+matriz_general <- as.matrix(matriz_general)
+
 saveRDS(matriz_general,"Datos/Resultados/Matriz.rds")
+
+
+# ------------------------- MATRIZ SIN NA'S
+matriz_general <- readRDS("Datos\\Resultados\\Matriz.rds")
+rownames(matriz_general) <- matriz_general[,1]
+matriz_general <- matriz_general[,-c(1)]
+
+# ------------ cambiamos los NA's por 0
+matriz_general <- as(matriz_general, "matrix")
+matriz_general[is.na(matriz_general)] <- 0
+
+saveRDS(matriz_general,"Datos\\Resultados\\Matriz_sinNA.rds")

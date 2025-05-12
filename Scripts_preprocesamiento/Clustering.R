@@ -23,18 +23,6 @@ cantidad_productos <- cantidad_productos %>%
   group_by(id_cliente_enc) %>% 
   summarise(media_unidades_por_compra = round(mean(cantidad_productos),0))
 
-# ----------------------- COMPRAS POR MES
-cantidad_mensual <- tickets %>%
-  select(id_cliente_enc, dia,num_ticket) %>%
-  distinct() %>%  # Nos quedamos con un registro por cliente y día
-  group_by(id_cliente_enc,month(dia)) %>%
-  mutate(cantidad_mensual=n())
-
-# sin que nos importe el mes
-cantidad_mensual <- cantidad_mensual %>% 
-  group_by(id_cliente_enc) %>% 
-  summarise(compras_por_mes= round(mean(cantidad_mensual),0))
-
 # ------------------------- CANTIDAD DE VECES QUE HA COMPRADO
 media_veces_compra <- tickets %>% 
   group_by(id_cliente_enc) %>% 
@@ -149,6 +137,7 @@ metodo_codo <- plot_ly(elbow_df, x = ~k, y = ~tot_withinss, type = "scatter",
             mode = "markers",
             marker = list(color = "red", size = 10)) %>%
   layout(
+    title = "Método del Codo para Determinar k",
     xaxis = list(title = "Número de Clusters (k)", tickvals = 1:10),
     yaxis = list(title = "Suma de Distancias Intra-cluster"),
     showlegend = FALSE  # Esto es para ocultar la leyenda
@@ -176,15 +165,28 @@ plot_ly(data = centroides_kmean,
         x = ~media_unidades_por_compra  ,
         y = ~media_de_dias_pasadas_por_compras ,
         z = ~total_veces_que_ha_comprado ,
-        type = "scatter3d",
-        color = ~cluster_KM)
+        type = "scatter",
+        color = ~cluster_KM,
+        colors = c( 
+          "#E10A23",  
+          "#A2CBE8", 
+          "#005B92",
+          "#F0928E"
+        ))
 
 # Graficar todos los puntos y el cluster al que pertenecen
-plot_ly(data = df_clustering,
+grafico_distribucion_centroides <- plot_ly(data = df_clustering,
         x = ~media_unidades_por_compra,
         y = ~total_veces_que_ha_comprado,
         type = "scatter",
-        color = ~cluster_KM)
+        color = ~cluster_KM,
+        colors = c( 
+          "#E10A23",  
+          "#A2CBE8", 
+          "#005B92",
+          "#F0928E"
+        ))
+
 
 #suma de distancias intra cluster
 intra_cluster_KM <- KMEANS$tot.withinss
