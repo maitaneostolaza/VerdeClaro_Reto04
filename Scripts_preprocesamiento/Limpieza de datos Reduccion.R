@@ -125,70 +125,16 @@ porcentaje_clientes_eliminados <- 100 * (1 - n_filtrado_cli / n_total_cli)
 
 cat("Se han eliminado aproximadamente", round(porcentaje_clientes_eliminados, 2), "% de clientes\n")
 
-print jprerw
 
 length(unique(data_final$id_cliente_enc))#22718
 length(unique(data_final$cod_est))#1683
 
 #Filtro Propio Por recien Compra
+tickets_grandes <- data_1 %>%
+  group_by(num_ticket) %>%
+  summarise(n_items = n()) %>%
+  filter(n_items >= 2) %>%
+  pull(num_ticket)
 
-data_final <- readRDS("Datos/Transformados/tickets_Reducidos.rds")
-clientes_variedad <- data_final %>%
-  group_by(id_cliente_enc) %>%
-  summarise(productos_diferentes = n_distinct(cod_est)) %>%
-  filter(productos_diferentes >= 5) %>%
-  pull(id_cliente_enc)
-
-data_filtrada_variedad <- data_final %>%
-  filter(id_cliente_enc %in% clientes_variedad)
-
-#saveRDS(data_filtrada_variedad, "Datos/Transformados/tickets_Filtrados_Variedad.rds")
-#Solo baja 10k de datos 
-
-#Otro Filtro
-tamanio_ticket <- data_final %>%
-  group_by(id_cliente_enc, num_ticket) %>%
-  summarise(n_productos = n(), .groups = "drop") %>%
-  group_by(id_cliente_enc) %>%
-  summarise(media_cesta = mean(n_productos)) %>%
-  filter(media_cesta >= 2) %>%
-  pull(id_cliente_enc)
-
-data_filtrada_cesta <- data_final %>%
-  filter(id_cliente_enc %in% tamanio_ticket)
-
-#saveRDS(data_filtrada_cesta, "Datos/Transformados/tickets_Filtrados_Cesta.rds")
-#Solo quita mil
-
-# Calcular frecuencia de productos, (productos poco populares)
-data_final <- readRDS("Datos/Transformados/tickets_Reducidos.rds")
-
-productos_populares <- data_final %>%
-  group_by(cod_est) %>%
-  summarise(frecuencia = n()) %>%
-  filter(frecuencia >= 30) %>%
-  pull(cod_est)
-
-# Filtrar dataset
-data_filtrada_popularidad <- data_final %>%
-  filter(cod_est %in% productos_populares)
-
-#saveRDS(data_filtrada_popularidad, "Datos/Transformados/tickets_Filtrados_Popularidad.rds")
-#Quita 8mil
-
-#Clientes con pocas compras totales
-#Clientes que han hecho solo 1 o 2 compras no permiten detectar patrones reales de comportamiento.
-clientes_fieles <- data_final %>%
-  group_by(id_cliente_enc) %>%
-  summarise(n_compras = n_distinct(num_ticket)) %>%
-  filter(n_compras >= 5) %>%
-  pull(id_cliente_enc)
-
-data_filtrada_clientes_fieles <- data_final %>%
-  filter(id_cliente_enc %in% clientes_fieles)
-
-#saveRDS(data_filtrada_clientes_fieles, "Datos/Transformados/tickets_Filtrados_ClientesFieles.rds")
-#EL MEJOR DE TODOS quita 600 mil
-
-length(unique(data_filtrada_clientes_fieles$id_cliente_enc))#7950
-length(unique(data_filtrada_clientes_fieles$cod_est))#1547
+data_2 <- data_1 %>%
+  filter(num_ticket %in% tickets_grandes)
