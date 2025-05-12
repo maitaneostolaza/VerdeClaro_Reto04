@@ -128,6 +128,7 @@ lista_1 <- attr(preds_1,'ids')
 
 # guardamos el df en resultados
 objretivo1_resultado <- as.data.frame(lista_1)
+rownames(objretivo1_resultado)<- c("MASAS DE PIZZA")
 saveRDS(objretivo1_resultado, "Datos\\Resultados\\Objetivo1_resultado.rds")
 
 ################################## OBJETIVO 2 ##################################
@@ -224,6 +225,7 @@ recomendaciones_o4 <- recomendaciones_o4 %>%
 saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
 
 
+<<<<<<< HEAD
 ##################### segunda prueba objetivo 4
 # Creo una lista vacia y en el bucle itero cada usuario del objetivo buscando 
 # la última compra realizada y guardando en la lista un df con la cantidad de 
@@ -269,3 +271,7 @@ preds_o4_df <- data.frame(id_cliente_enc = rownames(attr_preds_o4),
 preds_o4_nombres <- inner_join(preds_o4_df, productos, by = "cod_est")
 preds_o4_nombres
 saveRDS(preds_o4_nombres, "Datos/Resultados/Objetivo4_resultado.rds")
+=======
+
+
+>>>>>>> 4a159657823f9881b0729e309276cf9eaa4983db
