@@ -22,13 +22,10 @@ library(VIM)
 
 
 
-
-#PRUEBA
 # --- PRIMER FILTRO: cod_est ---
-
 data <- readRDS("Datos/Transformados/tickets_enc.rds")
 
-# Agrupar por cod_est y contar la cantidad de apariciones
+# 1. Filtrar productos fuera del rango intercuartílico
 conteo_cod <- data %>%
   group_by(cod_est) %>%
   summarise(cantidad = n(), .groups = "drop")
@@ -36,24 +33,32 @@ conteo_cod <- data %>%
 q1_cod <- quantile(conteo_cod$cantidad, 0.25, na.rm = TRUE)
 q3_cod <- quantile(conteo_cod$cantidad, 0.75, na.rm = TRUE)
 
-# Filtrar los cod_est fuera del rango intercuartílico
 cod_filtrados <- conteo_cod %>%
   filter(cantidad > q3_cod | cantidad <= q1_cod) %>%
   pull(cod_est)
 
-
 data_filtrada <- data %>%
   filter(cod_est %in% cod_filtrados)
 
+# 2. Añadir clientes objetivo (aunque hayan sido eliminados)
 objetivos <- readRDS("Datos/Originales/objetivos.RDS")
 clientes_objetivo <- purrr::map(objetivos, "obj") %>% unlist() %>% unique()
 
-# Recuperar registros de clientes objetivo que fueron eliminados por cod_est
 clientes_rescatados <- data %>%
   filter(id_cliente_enc %in% clientes_objetivo)
 
 data_filtrada <- bind_rows(data_filtrada, clientes_rescatados) %>%
-  distinct()  
+  distinct()
+
+# 3. Filtro adicional: eliminar productos que solo han sido comprados por 1 cliente
+productos_no_unicos <- data_filtrada %>%
+  group_by(cod_est) %>%
+  summarise(n_clientes = n_distinct(id_cliente_enc)) %>%
+  filter(n_clientes > 1) %>%
+  pull(cod_est)
+
+data_filtrada <- data_filtrada %>%
+  filter(cod_est %in% productos_no_unicos)
 
 saveRDS(data_filtrada, "Datos/Transformados/tickets_filtrados_cod_est.rds")
 
@@ -126,15 +131,6 @@ porcentaje_clientes_eliminados <- 100 * (1 - n_filtrado_cli / n_total_cli)
 cat("Se han eliminado aproximadamente", round(porcentaje_clientes_eliminados, 2), "% de clientes\n")
 
 
-length(unique(data_final$id_cliente_enc))#22718
-length(unique(data_final$cod_est))#1683
+length(unique(data_final$id_cliente_enc))#22716
+length(unique(data_final$cod_est))#1443
 
-#Filtro Propio Por recien Compra
-tickets_grandes <- data_1 %>%
-  group_by(num_ticket) %>%
-  summarise(n_items = n()) %>%
-  filter(n_items >= 2) %>%
-  pull(num_ticket)
-
-data_2 <- data_1 %>%
-  filter(num_ticket %in% tickets_grandes)
