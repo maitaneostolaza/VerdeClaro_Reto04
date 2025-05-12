@@ -177,56 +177,6 @@ saveRDS(objetivo3_resultado,"Datos\\Resultados\\Objetivo3_resultado.rds")
 ################################# OBJETIVO 4 ###################################
 obj4<-objetivos[[4]]$obj
 
-tickets_filtrados <- tickets[tickets$id_cliente_enc %in% obj4, ]
-
-ultimos_tickets <- tickets_filtrados %>%
-  group_by(id_cliente_enc) %>%
-  filter(dia == max(dia)) %>%
-  ungroup()
-
-historial_tickets <- anti_join(tickets_filtrados, ultimos_tickets, by = "num_ticket")
-
-
-tickets_matriz_agrupado <- historial_tickets %>%
-  group_by(id_cliente_enc, cod_est) %>%
-  summarise(N_compras = n(), .groups = "drop")
-
-df_matriz <- pivot_wider(
-  tickets_matriz_agrupado, 
-  names_from = "cod_est", 
-  values_from = "N_compras", 
-  values_fill = 0,
-  names_prefix = "id_"
-)
-
-matriz_sparse_o4 <- as(as.matrix(df_matriz[,-1]), "dgCMatrix")
-rownames(matriz_sparse_o4) <- df_matriz$id_cliente_enc
-
-
-modelo_wrmf_o4 <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
-modelo_wrmf_o4$fit_transform(matriz_sparse_o4, n_iter = 1000L, convergence_tol = 1e-6)
-
-preds_o4 <- modelo_wrmf_o4$predict(matriz_sparse_o4, k = 1)
-
-clientes <- rownames(matriz_sparse_o4)
-productos_predichos <- attr(preds_o4, "ids")
-
-recomendaciones_o4 <- data.frame(
-  id_cliente_enc = clientes,
-  producto_olvidado = productos_predichos
-)
-
-recomendaciones_o4 <- recomendaciones_o4 %>%
-  mutate(cod_est = str_remove(producto_olvidado, "id_")) %>%
-  left_join(productos %>% select(cod_est, descripcion), by = "cod_est") %>%
-  select(id_cliente_enc, cod_est, descripcion)
-
-# guardamos el df
-saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
-
-
-<<<<<<< HEAD
-##################### segunda prueba objetivo 4
 # Creo una lista vacia y en el bucle itero cada usuario del objetivo buscando 
 # la última compra realizada y guardando en la lista un df con la cantidad de 
 # cada producto comprado ese dia
@@ -271,7 +221,3 @@ preds_o4_df <- data.frame(id_cliente_enc = rownames(attr_preds_o4),
 preds_o4_nombres <- inner_join(preds_o4_df, productos, by = "cod_est")
 preds_o4_nombres
 saveRDS(preds_o4_nombres, "Datos/Resultados/Objetivo4_resultado.rds")
-=======
-
-
->>>>>>> 4a159657823f9881b0729e309276cf9eaa4983db
