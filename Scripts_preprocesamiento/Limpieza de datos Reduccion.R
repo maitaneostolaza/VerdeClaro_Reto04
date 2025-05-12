@@ -125,4 +125,5 @@ n_filtrado_cli <- n_distinct(data_final$id_cliente_enc)
 porcentaje_clientes_eliminados <- 100 * (1 - n_filtrado_cli / n_total_cli)
 
 cat("Se han eliminado aproximadamente", round(porcentaje_clientes_eliminados, 2), "% de clientes\n")
-a
+
+print jprerw
