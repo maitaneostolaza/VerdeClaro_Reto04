@@ -110,7 +110,7 @@ saveRDS(matriz_general,"Datos\\Resultados\\Matriz_sinNA.rds")
 matriz_general <- readRDS("Datos\\Resultados\\Matriz_sinNA.rds")
 storage.mode(matriz_general) <- "numeric"
 
-# para el objetivo 1 y 3 cambiamos filas por columnas
+# para el objetivo 1 cambiamos filas por columnas
 matriz_alreves <- t(matriz_general)
 
 # -- MODELO: 
@@ -225,5 +225,53 @@ recomendaciones_o4 <- recomendaciones_o4 %>%
 saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
 
 
+<<<<<<< HEAD
+##################### segunda prueba objetivo 4
+# Creo una lista vacia y en el bucle itero cada usuario del objetivo buscando 
+# la última compra realizada y guardando en la lista un df con la cantidad de 
+# cada producto comprado ese dia
+ultimas_compras <- list()
+for (c in obj4) {
+  tickets_matriz <- tickets %>% 
+    filter(id_cliente_enc == c) %>% 
+    filter(dia == max(dia))
+  
+  tickets_matriz_agrupado <- tickets_matriz %>% 
+    group_by(cod_est) %>% 
+    summarise(dia, N_compras = n()) %>% 
+    select(cod_est, N_compras)
+  
+  ultimas_compras[[c]] <- tickets_matriz_agrupado
+}
+
+# Creo una matriz vacia con las mismas columnas que se ha entrenado el modelo
+# y le pongo los nombres de las columnas y filas que les corresponden
+mo4 <- matrix(0, ncol = ncol(matriz_general), nrow = length(obj4))
+colnames(mo4) <- colnames(matriz_general)
+rownames(mo4) <- obj4
+
+# Con un for hago que para cada cliente y para cada producto comprado, ponga en
+# la matriz en la fila y columna correspondiente la cantidad comprada
+for (cliente in obj4) {
+  compra <- ultimas_compras[[cliente]]
+  for (prod in compra$cod_est) {
+    producto <- filter(compra, cod_est == prod)
+    mo4[cliente, prod] <- producto$N_compras
+  }
+}
+
+mo4 <- as(mo4, "sparseMatrix")
+
+preds_o4 <- modelo_wrmf$predict(mo4, k = 1, not_recommend = mo4)
+preds_o4
+attr_preds_o4 <- attr(preds_o4,'ids')
+preds_o4_df <- data.frame(id_cliente_enc = rownames(attr_preds_o4), 
+                          cod_est = attr_preds_o4, row.names = c()) 
+
+preds_o4_nombres <- inner_join(preds_o4_df, productos, by = "cod_est")
+preds_o4_nombres
+saveRDS(preds_o4_nombres, "Datos/Resultados/Objetivo4_resultado.rds")
+=======
 
 
+>>>>>>> 4a159657823f9881b0729e309276cf9eaa4983db
