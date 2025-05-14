@@ -168,7 +168,6 @@ saveRDS(objetivo3_resultado,"Datos\\Resultados\\Objetivo3_resultado.rds")
 ################################# OBJETIVO 4 ###################################
 obj4<-objetivos[[4]]$obj
 
-<<<<<<< HEAD
 tickets_filtrados <- tickets[tickets$id_cliente_enc %in% obj4, ]
 
 ultimos_tickets <- tickets_filtrados %>%
@@ -218,8 +217,7 @@ saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
 
 
 ##################### segunda prueba objetivo 4
-=======
->>>>>>> 036150d3d568744f25f0e069b471cb99fdb14f67
+
 # Creo una lista vacia y en el bucle itero cada usuario del objetivo buscando 
 # la última compra realizada y guardando en la lista un df con la cantidad de 
 # cada producto comprado ese dia
