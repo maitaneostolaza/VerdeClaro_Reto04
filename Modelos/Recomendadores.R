@@ -95,15 +95,6 @@ avg(eval_ratings[["svdf_200"]])
 
 
 ############################### RSPARSE ########################################
-matriz_general <- readRDS("Datos\\Resultados\\Matriz.rds")
-rownames(matriz_general) <- matriz_general[,1]
-matriz_general <- matriz_general[,-c(1)]
-
-# ------------ cambiamos los NA's por 0
-matriz_general <- as(matriz_general, "matrix")
-matriz_general[is.na(matriz_general)] <- 0
-
-saveRDS(matriz_general,"Datos\\Resultados\\Matriz_sinNA.rds")
 
 ############################### OBJETIVO 1 #####################################
 # Creamos el modelo WRMF -------------------------------------------------------
@@ -225,7 +216,6 @@ recomendaciones_o4 <- recomendaciones_o4 %>%
 saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
 
 
-<<<<<<< HEAD
 ##################### segunda prueba objetivo 4
 # Creo una lista vacia y en el bucle itero cada usuario del objetivo buscando 
 # la última compra realizada y guardando en la lista un df con la cantidad de 

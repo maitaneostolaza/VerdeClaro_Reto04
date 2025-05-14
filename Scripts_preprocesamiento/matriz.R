@@ -165,6 +165,7 @@ producto_mas_comprado <- producto_mas_comprado %>%
 
 ############################### CREACION MATRIZ ################################
 # VAMOS A HACER UNA MATRIZ POR CLUSTER PARA QUE LAS RECOMENDACIONES SEAN MÁS ESPECIFICAS
+df <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
 str(df)
 cluster1 <- df %>%
   filter(cluster == 1) %>% 
