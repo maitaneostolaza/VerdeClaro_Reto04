@@ -45,9 +45,3 @@ Introduce un cliente_id del objetivo 4.
 
 Pulsa “Execute” y obtendrás el producto olvidado.
 
-💡 Consejos
-Si introduces un cliente que no forma parte del objetivo correspondiente, la API lo detectará y te avisará con un mensaje de error.
-
-La información que devuelve está en formato JSON: muestra el código del producto (cod_est) y su nombre.
-
-Puedes probar varias veces sin reiniciar ni recargar nada.
