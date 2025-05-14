@@ -1,4 +1,4 @@
-🧭 Cómo probar la API de Recomendaciones
+🧭 Cómo probar la API de Recomendaciones.
 Una vez tengas abierta la interfaz de la API en tu navegador, verás una pantalla con todas las funcionalidades disponibles. Desde ahí puedes probarlas fácilmente sin necesidad de escribir código.
 
 A continuación, te explico cómo funciona cada una:
