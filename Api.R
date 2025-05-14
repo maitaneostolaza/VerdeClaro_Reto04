@@ -13,7 +13,7 @@ maestro    <- readRDS("Datos/Originales/maestroestr.RDS")
 
 
 #* Recomendación: artículo promocionado (Objetivo 1 adaptado)
-#* @get /recomendar_promocion
+#* @get recomendar_promocion
 function(){
   # El nombre del producto está como rowname o primera columna
   nombre_prod <- rownames(resultado1)[1]
@@ -41,7 +41,7 @@ function(){
 
 #* Recomendación: otros como tú han comprado (Objetivo 2)
 #* @param cliente_id ID del cliente
-#* @get /recomendar_otros_como_tu
+#* @get recomendar_otros_como_tu
 function(cliente_id){
   if (!"Id_cliente" %in% colnames(resultado2) || !"cod_est" %in% colnames(resultado2)) {
     return(list(error = "Estructura incorrecta del archivo Objetivo2_resultado.rds"))
@@ -66,7 +66,7 @@ function(cliente_id){
 
 #* Recomendación: producto en oferta más adecuado (Objetivo 3)
 #* @param cliente_id ID del cliente
-#* @get /recomendar_oferta
+#* @get recomendar_oferta
 function(cliente_id){
   if (!"Id_cliente" %in% colnames(resultado3) || !"cod_est" %in% colnames(resultado3)) {
     return(list(error = "Estructura incorrecta del archivo Objetivo3_resultado.rds"))
@@ -91,7 +91,7 @@ function(cliente_id){
 
 #* Recomendación: ítem olvidado (Objetivo 4)
 #* @param cliente_id ID del cliente
-#* @get /recomendar_olvido
+#* @get recomendar_olvido
 function(cliente_id){
   fila <- resultado4 %>% filter(id_cliente_enc == cliente_id)
   

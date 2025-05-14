@@ -22,13 +22,10 @@ library(VIM)
 
 
 
-
-#PRUEBA
 # --- PRIMER FILTRO: cod_est ---
-
 data <- readRDS("Datos/Transformados/tickets_enc.rds")
 
-# Agrupar por cod_est y contar la cantidad de apariciones
+# 1. Filtrar productos fuera del rango intercuartílico
 conteo_cod <- data %>%
   group_by(cod_est) %>%
   summarise(cantidad = n(), .groups = "drop")
@@ -36,24 +33,32 @@ conteo_cod <- data %>%
 q1_cod <- quantile(conteo_cod$cantidad, 0.25, na.rm = TRUE)
 q3_cod <- quantile(conteo_cod$cantidad, 0.75, na.rm = TRUE)
 
-# Filtrar los cod_est fuera del rango intercuartílico
 cod_filtrados <- conteo_cod %>%
   filter(cantidad > q3_cod | cantidad <= q1_cod) %>%
   pull(cod_est)
 
-
 data_filtrada <- data %>%
   filter(cod_est %in% cod_filtrados)
 
+# 2. Añadir clientes objetivo (aunque hayan sido eliminados)
 objetivos <- readRDS("Datos/Originales/objetivos.RDS")
 clientes_objetivo <- purrr::map(objetivos, "obj") %>% unlist() %>% unique()
 
-# Recuperar registros de clientes objetivo que fueron eliminados por cod_est
 clientes_rescatados <- data %>%
   filter(id_cliente_enc %in% clientes_objetivo)
 
 data_filtrada <- bind_rows(data_filtrada, clientes_rescatados) %>%
-  distinct()  
+  distinct()
+
+# 3. Filtro adicional: eliminar productos que solo han sido comprados por 1 cliente
+productos_no_unicos <- data_filtrada %>%
+  group_by(cod_est) %>%
+  summarise(n_clientes = n_distinct(id_cliente_enc)) %>%
+  filter(n_clientes > 1) %>%
+  pull(cod_est)
+
+data_filtrada <- data_filtrada %>%
+  filter(cod_est %in% productos_no_unicos)
 
 saveRDS(data_filtrada, "Datos/Transformados/tickets_filtrados_cod_est.rds")
 
@@ -125,70 +130,7 @@ porcentaje_clientes_eliminados <- 100 * (1 - n_filtrado_cli / n_total_cli)
 
 cat("Se han eliminado aproximadamente", round(porcentaje_clientes_eliminados, 2), "% de clientes\n")
 
-print jprerw
 
-length(unique(data_final$id_cliente_enc))#22718
-length(unique(data_final$cod_est))#1683
+length(unique(data_final$id_cliente_enc))#22716
+length(unique(data_final$cod_est))#1443
 
-#Filtro Propio Por recien Compra
-
-data_final <- readRDS("Datos/Transformados/tickets_Reducidos.rds")
-clientes_variedad <- data_final %>%
-  group_by(id_cliente_enc) %>%
-  summarise(productos_diferentes = n_distinct(cod_est)) %>%
-  filter(productos_diferentes >= 5) %>%
-  pull(id_cliente_enc)
-
-data_filtrada_variedad <- data_final %>%
-  filter(id_cliente_enc %in% clientes_variedad)
-
-#saveRDS(data_filtrada_variedad, "Datos/Transformados/tickets_Filtrados_Variedad.rds")
-#Solo baja 10k de datos 
-
-#Otro Filtro
-tamanio_ticket <- data_final %>%
-  group_by(id_cliente_enc, num_ticket) %>%
-  summarise(n_productos = n(), .groups = "drop") %>%
-  group_by(id_cliente_enc) %>%
-  summarise(media_cesta = mean(n_productos)) %>%
-  filter(media_cesta >= 2) %>%
-  pull(id_cliente_enc)
-
-data_filtrada_cesta <- data_final %>%
-  filter(id_cliente_enc %in% tamanio_ticket)
-
-#saveRDS(data_filtrada_cesta, "Datos/Transformados/tickets_Filtrados_Cesta.rds")
-#Solo quita mil
-
-# Calcular frecuencia de productos, (productos poco populares)
-data_final <- readRDS("Datos/Transformados/tickets_Reducidos.rds")
-
-productos_populares <- data_final %>%
-  group_by(cod_est) %>%
-  summarise(frecuencia = n()) %>%
-  filter(frecuencia >= 30) %>%
-  pull(cod_est)
-
-# Filtrar dataset
-data_filtrada_popularidad <- data_final %>%
-  filter(cod_est %in% productos_populares)
-
-#saveRDS(data_filtrada_popularidad, "Datos/Transformados/tickets_Filtrados_Popularidad.rds")
-#Quita 8mil
-
-#Clientes con pocas compras totales
-#Clientes que han hecho solo 1 o 2 compras no permiten detectar patrones reales de comportamiento.
-clientes_fieles <- data_final %>%
-  group_by(id_cliente_enc) %>%
-  summarise(n_compras = n_distinct(num_ticket)) %>%
-  filter(n_compras >= 5) %>%
-  pull(id_cliente_enc)
-
-data_filtrada_clientes_fieles <- data_final %>%
-  filter(id_cliente_enc %in% clientes_fieles)
-
-#saveRDS(data_filtrada_clientes_fieles, "Datos/Transformados/tickets_Filtrados_ClientesFieles.rds")
-#EL MEJOR DE TODOS quita 600 mil
-
-length(unique(data_filtrada_clientes_fieles$id_cliente_enc))#7950
-length(unique(data_filtrada_clientes_fieles$cod_est))#1547
