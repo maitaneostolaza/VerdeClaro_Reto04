@@ -42,7 +42,19 @@ df_reducido_clien <- df_numeric[clientes_validos, ]
 compras_por_producto_filtrado <- colSums(df_reducido_clien, na.rm = TRUE)
 
 #---------- PRODUCTOS
+<<<<<<< HEAD
 productos_validos <- compras_por_producto_filtrado >= 1000
+=======
+<<<<<<< HEAD
+productos_validos <- compras_por_producto_filtrado >= 1000
+=======
+<<<<<<< HEAD
+productos_validos <- compras_por_producto_filtrado >= 2000
+=======
+productos_validos <- compras_por_producto_filtrado >= 1000
+>>>>>>> 35f53198c60e3923c78bd5b09f2808c5679f1232
+>>>>>>> 94f7eae52ba500b036b068d404c34f2879d1ad89
+>>>>>>> 0e9087231b53681f0425149e165c11e987147f47
 df_reducido <- df_reducido_clien[, productos_validos]
 dim(df_reducido)
 
