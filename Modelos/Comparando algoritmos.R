@@ -42,11 +42,7 @@ df_reducido_clien <- df_numeric[clientes_validos, ]
 compras_por_producto_filtrado <- colSums(df_reducido_clien, na.rm = TRUE)
 
 #---------- PRODUCTOS
-<<<<<<< HEAD
-productos_validos <- compras_por_producto_filtrado >= 2000
-=======
 productos_validos <- compras_por_producto_filtrado >= 1000
->>>>>>> 35f53198c60e3923c78bd5b09f2808c5679f1232
 df_reducido <- df_reducido_clien[, productos_validos]
 dim(df_reducido)
 
@@ -90,8 +86,7 @@ matriz_rec <- as(matriz_sparse, "realRatingMatrix")
 
 set.seed(8)
 # --------------------------- TRAIN Y TEST
-str(matriz_rec)
-min(rowCounts(matriz_rec))
+
 eval_scheme <- evaluationScheme(matriz_rec, method = "split",
                                 train = 0.8, given= 5,
                                 goodRating = 1)
@@ -135,12 +130,3 @@ recs <- predict(Recommender(getData(eval_scheme, "train"), method = "UBCF", para
 
 # Verifica cuántas recomendaciones hay por usuario
 summary(recs)
-
-
-
-
-
-
-
-
-
