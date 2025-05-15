@@ -42,7 +42,7 @@ df_reducido_clien <- df_numeric[clientes_validos, ]
 compras_por_producto_filtrado <- colSums(df_reducido_clien, na.rm = TRUE)
 
 #---------- PRODUCTOS
-productos_validos <- compras_por_producto_filtrado >= media_productos
+productos_validos <- compras_por_producto_filtrado >= 2000
 df_reducido <- df_reducido_clien[, productos_validos]
 
 # ----------- COMPROBAMOS REDUCCION
@@ -91,7 +91,8 @@ matriz_rec <- as(matriz_sparse, "realRatingMatrix")
 
 set.seed(8)
 # --------------------------- TRAIN Y TEST
-
+str(matriz_rec)
+min(rowCounts(matriz_rec))
 eval_scheme <- evaluationScheme(matriz_rec, method = "split",
                                 train = 0.8, given= 5,
                                 goodRating = 1)
