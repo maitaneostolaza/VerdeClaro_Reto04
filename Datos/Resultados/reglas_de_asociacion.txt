@@ -1,0 +1,153 @@
+=== Run information ===
+
+Scheme:       weka.associations.Apriori -N 500 -T 0 -C 0.9 -D 0.05 -U 1.0 -M 0.1 -S -1.0 -c -1
+Relation:     matriz
+Instances:    9121
+Attributes:   617
+              [list of attributes omitted]
+=== Associator model (full training set) ===
+
+
+Apriori
+=======
+
+Minimum support: 0.1 (912 instances)
+Minimum metric <confidence>: 0.9
+Number of cycles performed: 18
+
+Generated sets of large itemsets:
+
+Size of set of large itemsets L(1): 338
+
+Size of set of large itemsets L(2): 2046
+
+Size of set of large itemsets L(3): 1543
+
+Size of set of large itemsets L(4): 381
+
+Size of set of large itemsets L(5): 13
+
+Best rules found:
+
+  1. PIMIENTOS ROJOS=t PUERROS=t PIMIENTOS VERDES=t 1119 ==> ZANAHORIAS=t 1042    <conf:(0.93)> lift:(1.35) lev:(0.03) [271] conv:(4.46)
+  2. CALABACINES=t CEBOLLAS AMARILLAS=t PUERROS=t PIMIENTOS VERDES=t 1102 ==> ZANAHORIAS=t 1026    <conf:(0.93)> lift:(1.35) lev:(0.03) [266] conv:(4.45)
+  3. MANDARINAS POSTRE=t CALABACINES=t CEBOLLAS AMARILLAS=t PUERROS=t 1028 ==> ZANAHORIAS=t 957    <conf:(0.93)> lift:(1.35) lev:(0.03) [248] conv:(4.44)
+  4. PIMIENTOS ROJOS=t CEBOLLAS AMARILLAS=t PUERROS=t 1010 ==> ZANAHORIAS=t 940    <conf:(0.93)> lift:(1.35) lev:(0.03) [244] conv:(4.42)
+  5. CALABACINES=t PATATAS TODO USO=t CEBOLLAS AMARILLAS=t PUERROS=t 1101 ==> ZANAHORIAS=t 1024    <conf:(0.93)> lift:(1.35) lev:(0.03) [265] conv:(4.39)
+  6. PIMIENTOS ROJOS=t CALABACINES=t PUERROS=t 1158 ==> ZANAHORIAS=t 1077    <conf:(0.93)> lift:(1.35) lev:(0.03) [279] conv:(4.39)
+  7. CALABACINES=t PATATAS TODO USO=t PUERROS=t PIMIENTOS VERDES=t 1018 ==> ZANAHORIAS=t 946    <conf:(0.93)> lift:(1.35) lev:(0.03) [244] conv:(4.34)
+  8. MANDARINAS POSTRE=t CALABACINES=t PATATAS TODO USO=t PUERROS=t 1035 ==> ZANAHORIAS=t 961    <conf:(0.93)> lift:(1.35) lev:(0.03) [247] conv:(4.29)
+  9. PLATANOS DE CANARIAS=t CALABACINES=t PUERROS=t PIMIENTOS VERDES=t 1090 ==> ZANAHORIAS=t 1012    <conf:(0.93)> lift:(1.35) lev:(0.03) [261] conv:(4.29)
+ 10. PUERROS=t PIMIENTOS VERDES=t JUDIAS PLANAS=t 1006 ==> ZANAHORIAS=t 933    <conf:(0.93)> lift:(1.35) lev:(0.03) [239] conv:(4.23)
+ 11. P.H. SECO BASICO 2C LARGO=t CALABACINES=t CEBOLLAS AMARILLAS=t PUERROS=t 993 ==> ZANAHORIAS=t 920    <conf:(0.93)> lift:(1.34) lev:(0.03) [235] conv:(4.17)
+ 12. LIMONES=t PUERROS=t PIMIENTOS VERDES=t 1010 ==> ZANAHORIAS=t 933    <conf:(0.92)> lift:(1.34) lev:(0.03) [237] conv:(4.03)
+ 13. PLATANOS DE CANARIAS=t CALABACINES=t PATATAS TODO USO=t PUERROS=t 1109 ==> ZANAHORIAS=t 1024    <conf:(0.92)> lift:(1.34) lev:(0.03) [259] conv:(4.01)
+ 14. PLATANOS DE CANARIAS=t PUERROS=t PIMIENTOS VERDES=t 1388 ==> ZANAHORIAS=t 1281    <conf:(0.92)> lift:(1.34) lev:(0.04) [324] conv:(4)
+ 15. PLATANOS DE CANARIAS=t CALABACINES=t CEBOLLAS AMARILLAS=t PUERROS=t 1108 ==> ZANAHORIAS=t 1022    <conf:(0.92)> lift:(1.34) lev:(0.03) [258] conv:(3.96)
+ 16. PIMIENTOS ROJOS=t PUERROS=t 1496 ==> ZANAHORIAS=t 1379    <conf:(0.92)> lift:(1.34) lev:(0.04) [348] conv:(3.94)
+ 17. CALABACINES=t PUERROS=t BROCOLIS=t 1190 ==> ZANAHORIAS=t 1096    <conf:(0.92)> lift:(1.34) lev:(0.03) [276] conv:(3.9)
+ 18. CALABAZAS=t CALABACINES=t PUERROS=t 1149 ==> ZANAHORIAS=t 1058    <conf:(0.92)> lift:(1.34) lev:(0.03) [266] conv:(3.88)
+ 19. CALABACINES=t PUERROS=t PIMIENTOS VERDES=t 1577 ==> ZANAHORIAS=t 1452    <conf:(0.92)> lift:(1.34) lev:(0.04) [365] conv:(3.89)
+ 20. CALABACINES=t CEBOLLAS AMARILLAS=t PUERROS=t 1736 ==> ZANAHORIAS=t 1597    <conf:(0.92)> lift:(1.34) lev:(0.04) [400] conv:(3.86)
+ 21. MANZANAS DULCES GOLDEN=t CEBOLLAS AMARILLAS=t PUERROS=t 1061 ==> ZANAHORIAS=t 976    <conf:(0.92)> lift:(1.34) lev:(0.03) [245] conv:(3.84)
+ 22. CALABACINES=t PUERROS=t JUDIAS PLANAS=t 1318 ==> ZANAHORIAS=t 1212    <conf:(0.92)> lift:(1.33) lev:(0.03) [303] conv:(3.83)
+ 23. CALABACINES=t LENTEJA PARDINA=t PUERROS=t 1200 ==> ZANAHORIAS=t 1103    <conf:(0.92)> lift:(1.33) lev:(0.03) [276] conv:(3.81)
+ 24. CALABACINES=t PERAS CONFERENCIA=t PUERROS=t 1076 ==> ZANAHORIAS=t 989    <conf:(0.92)> lift:(1.33) lev:(0.03) [247] conv:(3.8)
+ 25. PLATANOS DE CANARIAS=t P.H. SECO BASICO 2C LARGO=t CALABACINES=t PUERROS=t 1038 ==> ZANAHORIAS=t 954    <conf:(0.92)> lift:(1.33) lev:(0.03) [238] conv:(3.8)
+ 26. MANDARINAS POSTRE=t PUERROS=t JUDIAS PLANAS=t 1025 ==> ZANAHORIAS=t 942    <conf:(0.92)> lift:(1.33) lev:(0.03) [235] conv:(3.8)
+ 27. AGUACATES=t CEBOLLAS AMARILLAS=t PUERROS=t 1123 ==> ZANAHORIAS=t 1032    <conf:(0.92)> lift:(1.33) lev:(0.03) [258] conv:(3.8)
+ 28. CEBOLLAS AMARILLAS=t CHAMPIÑONES=t PUERROS=t 1168 ==> ZANAHORIAS=t 1073    <conf:(0.92)> lift:(1.33) lev:(0.03) [268] conv:(3.78)
+ 29. CALABACINES=t CEBOLLAS AMARILLAS=t BROCOLIS=t 1047 ==> ZANAHORIAS=t 961    <conf:(0.92)> lift:(1.33) lev:(0.03) [239] conv:(3.74)
+ 30. MANDARINAS POSTRE=t PUERROS=t PIMIENTOS VERDES=t 1200 ==> ZANAHORIAS=t 1101    <conf:(0.92)> lift:(1.33) lev:(0.03) [274] conv:(3.73)
+ 31. CALABAZAS=t CEBOLLAS AMARILLAS=t 1102 ==> ZANAHORIAS=t 1011    <conf:(0.92)> lift:(1.33) lev:(0.03) [251] conv:(3.73)
+ 32. LIMONES=t CEBOLLAS AMARILLAS=t PUERROS=t 1061 ==> ZANAHORIAS=t 973    <conf:(0.92)> lift:(1.33) lev:(0.03) [242] conv:(3.71)
+ 33. PLATANOS DE CANARIAS=t LIMONES=t PUERROS=t 1121 ==> ZANAHORIAS=t 1028    <conf:(0.92)> lift:(1.33) lev:(0.03) [255] conv:(3.71)
+ 34. CEBOLLAS AMARILLAS=t PUERROS=t TOMATES ENSALADA=t 1153 ==> ZANAHORIAS=t 1057    <conf:(0.92)> lift:(1.33) lev:(0.03) [262] conv:(3.7)
+ 35. PLATANOS DE CANARIAS=t MANDARINAS POSTRE=t CALABACINES=t PUERROS=t 1153 ==> ZANAHORIAS=t 1057    <conf:(0.92)> lift:(1.33) lev:(0.03) [262] conv:(3.7)
+ 36. CEBOLLAS AMARILLAS=t PUERROS=t PIMIENTOS VERDES=t 1420 ==> ZANAHORIAS=t 1301    <conf:(0.92)> lift:(1.33) lev:(0.04) [322] conv:(3.68)
+ 37. PLATANOS DE CANARIAS=t CALABACINES=t AGUACATES=t PUERROS=t 1026 ==> ZANAHORIAS=t 940    <conf:(0.92)> lift:(1.33) lev:(0.03) [233] conv:(3.67)
+ 38. CALABACINES=t ARROZ REDONDO=t PUERROS=t 1203 ==> ZANAHORIAS=t 1102    <conf:(0.92)> lift:(1.33) lev:(0.03) [273] conv:(3.67)
+ 39. CALABACINES=t LIMONES=t PUERROS=t 1238 ==> ZANAHORIAS=t 1134    <conf:(0.92)> lift:(1.33) lev:(0.03) [281] conv:(3.67)
+ 40. PIMIENTOS ROJOS=t CALABACINES=t CEBOLLAS AMARILLAS=t 1090 ==> ZANAHORIAS=t 998    <conf:(0.92)> lift:(1.33) lev:(0.03) [247] conv:(3.65)
+ 41. CALABACINES=t PATATAS TODO USO=t PUERROS=t 1673 ==> ZANAHORIAS=t 1531    <conf:(0.92)> lift:(1.33) lev:(0.04) [378] conv:(3.64)
+ 42. PATATAS TODO USO=t LENTEJA PARDINA=t PUERROS=t 1022 ==> ZANAHORIAS=t 935    <conf:(0.91)> lift:(1.33) lev:(0.03) [230] conv:(3.61)
+ 43. CHAMPIÑONES=t PUERROS=t PIMIENTOS VERDES=t 1151 ==> ZANAHORIAS=t 1053    <conf:(0.91)> lift:(1.33) lev:(0.03) [260] conv:(3.62)
+ 44. PLATANOS DE CANARIAS=t LENTEJA PARDINA=t PUERROS=t 1080 ==> ZANAHORIAS=t 988    <conf:(0.91)> lift:(1.33) lev:(0.03) [243] conv:(3.61)
+ 45. P.H. SECO BASICO 2C LARGO=t PUERROS=t PIMIENTOS VERDES=t 1216 ==> ZANAHORIAS=t 1112    <conf:(0.91)> lift:(1.33) lev:(0.03) [274] conv:(3.6)
+ 46. LENTEJA PARDINA=t CEBOLLAS AMARILLAS=t PUERROS=t 1073 ==> ZANAHORIAS=t 981    <conf:(0.91)> lift:(1.33) lev:(0.03) [241] conv:(3.59)
+ 47. CALABACINES=t PUERROS=t AJOS MORADOS=t 1014 ==> ZANAHORIAS=t 927    <conf:(0.91)> lift:(1.33) lev:(0.03) [228] conv:(3.58)
+ 48. PATATAS TODO USO=t PUERROS=t PIMIENTOS VERDES=t 1335 ==> ZANAHORIAS=t 1219    <conf:(0.91)> lift:(1.33) lev:(0.03) [299] conv:(3.55)
+ 49. CEBOLLAS AMARILLAS=t PUERROS=t JUDIAS PLANAS=t 1081 ==> ZANAHORIAS=t 987    <conf:(0.91)> lift:(1.33) lev:(0.03) [242] conv:(3.54)
+ 50. MANDARINAS POSTRE=t CEBOLLAS AMARILLAS=t PUERROS=t 1331 ==> ZANAHORIAS=t 1215    <conf:(0.91)> lift:(1.32) lev:(0.03) [297] conv:(3.54)
+ 51. AGUACATES=t PUERROS=t PIMIENTOS VERDES=t 1038 ==> ZANAHORIAS=t 947    <conf:(0.91)> lift:(1.32) lev:(0.03) [231] conv:(3.51)
+ 52. LIMONES=t PATATAS TODO USO=t PUERROS=t 1011 ==> ZANAHORIAS=t 922    <conf:(0.91)> lift:(1.32) lev:(0.02) [225] conv:(3.49)
+ 53. PUERROS=t BERENJENAS=t 1043 ==> ZANAHORIAS=t 951    <conf:(0.91)> lift:(1.32) lev:(0.03) [232] conv:(3.49)
+ 54. PATATAS TODO USO=t PUERROS=t JUDIAS PLANAS=t 1064 ==> ZANAHORIAS=t 970    <conf:(0.91)> lift:(1.32) lev:(0.03) [236] conv:(3.48)
+ 55. PUERROS=t PIMIENTOS VERDES=t TOMATES ENSALADA=t 1109 ==> ZANAHORIAS=t 1011    <conf:(0.91)> lift:(1.32) lev:(0.03) [246] conv:(3.48)
+ 56. MANZANAS DULCES GOLDEN=t CALABACINES=t PUERROS=t 1288 ==> ZANAHORIAS=t 1174    <conf:(0.91)> lift:(1.32) lev:(0.03) [286] conv:(3.48)
+ 57. PLATANOS DE CANARIAS=t PERAS CONFERENCIA=t PUERROS=t 1003 ==> ZANAHORIAS=t 914    <conf:(0.91)> lift:(1.32) lev:(0.02) [222] conv:(3.47)
+ 58. CALABACINES=t PIMIENTOS VERDES=t JUDIAS PLANAS=t 1044 ==> ZANAHORIAS=t 951    <conf:(0.91)> lift:(1.32) lev:(0.03) [231] conv:(3.45)
+ 59. PLATANOS DE CANARIAS=t CEBOLLAS AMARILLAS=t PUERROS=t 1478 ==> ZANAHORIAS=t 1346    <conf:(0.91)> lift:(1.32) lev:(0.04) [327] conv:(3.46)
+ 60. CALABACINES=t PUERROS=t VERDURA Y HORTALIZA CRUDA=t 1063 ==> ZANAHORIAS=t 968    <conf:(0.91)> lift:(1.32) lev:(0.03) [235] conv:(3.44)
+ 61. MANDARINAS POSTRE=t CALABACINES=t PUERROS=t 1633 ==> ZANAHORIAS=t 1487    <conf:(0.91)> lift:(1.32) lev:(0.04) [361] conv:(3.46)
+ 62. CALABACINES=t LENTEJA PARDINA=t CEBOLLAS AMARILLAS=t 1059 ==> ZANAHORIAS=t 964    <conf:(0.91)> lift:(1.32) lev:(0.03) [234] conv:(3.43)
+ 63. MANZANAS DULCES GOLDEN=t PATATAS TODO USO=t PUERROS=t 1068 ==> ZANAHORIAS=t 972    <conf:(0.91)> lift:(1.32) lev:(0.03) [236] conv:(3.42)
+ 64. AGUACATES=t PATATAS TODO USO=t PUERROS=t 1116 ==> ZANAHORIAS=t 1015    <conf:(0.91)> lift:(1.32) lev:(0.03) [246] conv:(3.4)
+ 65. CALABACINES=t PUERROS=t TOMATES ENSALADA=t 1390 ==> ZANAHORIAS=t 1264    <conf:(0.91)> lift:(1.32) lev:(0.03) [306] conv:(3.4)
+ 66. CEBOLLAS AMARILLAS=t ARROZ REDONDO=t PUERROS=t 1142 ==> ZANAHORIAS=t 1038    <conf:(0.91)> lift:(1.32) lev:(0.03) [251] conv:(3.38)
+ 67. CALABACINES=t CEBOLLAS AMARILLAS=t JUDIAS PLANAS=t 1118 ==> ZANAHORIAS=t 1016    <conf:(0.91)> lift:(1.32) lev:(0.03) [245] conv:(3.38)
+ 68. PLATANOS DE CANARIAS=t PUERROS=t BROCOLIS=t 1018 ==> ZANAHORIAS=t 925    <conf:(0.91)> lift:(1.32) lev:(0.02) [223] conv:(3.37)
+ 69. PUERROS=t TOMATES RAMA=t 1137 ==> ZANAHORIAS=t 1033    <conf:(0.91)> lift:(1.32) lev:(0.03) [249] conv:(3.37)
+ 70. PUERROS=t MELONES PIEL DE SAPO=t 1027 ==> ZANAHORIAS=t 933    <conf:(0.91)> lift:(1.32) lev:(0.02) [225] conv:(3.36)
+ 71. PLATANOS DE CANARIAS=t PUERROS=t JUDIAS PLANAS=t 1179 ==> ZANAHORIAS=t 1071    <conf:(0.91)> lift:(1.32) lev:(0.03) [258] conv:(3.36)
+ 72. ENTERO DE SABORES=t CEBOLLAS AMARILLAS=t PUERROS=t 1004 ==> ZANAHORIAS=t 912    <conf:(0.91)> lift:(1.32) lev:(0.02) [220] conv:(3.36)
+ 73. PLATANOS DE CANARIAS=t CALABACINES=t CHAMPIÑONES=t PUERROS=t 1013 ==> ZANAHORIAS=t 920    <conf:(0.91)> lift:(1.32) lev:(0.02) [222] conv:(3.35)
+ 74. CALABAZAS=t PATATAS TODO USO=t 1120 ==> ZANAHORIAS=t 1017    <conf:(0.91)> lift:(1.32) lev:(0.03) [245] conv:(3.35)
+ 75. CALABAZAS=t PUERROS=t 1380 ==> ZANAHORIAS=t 1253    <conf:(0.91)> lift:(1.32) lev:(0.03) [302] conv:(3.35)
+ 76. LECHUGAS=t PUERROS=t PIMIENTOS VERDES=t 1115 ==> ZANAHORIAS=t 1012    <conf:(0.91)> lift:(1.32) lev:(0.03) [243] conv:(3.33)
+ 77. MANZANAS DULCES GOLDEN=t CALABACINES=t CEBOLLAS AMARILLAS=t 1167 ==> ZANAHORIAS=t 1059    <conf:(0.91)> lift:(1.32) lev:(0.03) [254] conv:(3.33)
+ 78. PLATANOS DE CANARIAS=t PATATAS TODO USO=t PUERROS=t 1499 ==> ZANAHORIAS=t 1360    <conf:(0.91)> lift:(1.32) lev:(0.04) [327] conv:(3.33)
+ 79. CALABACINES=t AGUACATES=t PUERROS=t 1480 ==> ZANAHORIAS=t 1342    <conf:(0.91)> lift:(1.32) lev:(0.04) [322] conv:(3.31)
+ 80. PUERROS=t PIMIENTOS VERDES=t 2102 ==> ZANAHORIAS=t 1906    <conf:(0.91)> lift:(1.32) lev:(0.05) [457] conv:(3.32)
+ 81. CALABACINES=t PATATAS TODO USO=t JUDIAS PLANAS=t 1103 ==> ZANAHORIAS=t 1000    <conf:(0.91)> lift:(1.32) lev:(0.03) [240] conv:(3.3)
+ 82. PLATANOS DE CANARIAS=t CALABAZAS=t CALABACINES=t 1028 ==> ZANAHORIAS=t 932    <conf:(0.91)> lift:(1.32) lev:(0.02) [223] conv:(3.3)
+ 83. CALABACINES=t PATATAS TODO USO=t LENTEJA PARDINA=t 1036 ==> ZANAHORIAS=t 939    <conf:(0.91)> lift:(1.32) lev:(0.02) [225] conv:(3.29)
+ 84. MANDARINAS POSTRE=t CHAMPIÑONES=t PUERROS=t 1119 ==> ZANAHORIAS=t 1014    <conf:(0.91)> lift:(1.32) lev:(0.03) [243] conv:(3.28)
+ 85. CALABACINES=t CHAMPIÑONES=t PUERROS=t 1491 ==> ZANAHORIAS=t 1351    <conf:(0.91)> lift:(1.32) lev:(0.04) [323] conv:(3.29)
+ 86. CALABACINES=t PATATAS TODO USO=t BROCOLIS=t 1022 ==> ZANAHORIAS=t 926    <conf:(0.91)> lift:(1.32) lev:(0.02) [221] conv:(3.28)
+ 87. P.H. SECO BASICO 2C LARGO=t CALABACINES=t PUERROS=t 1596 ==> ZANAHORIAS=t 1446    <conf:(0.91)> lift:(1.32) lev:(0.04) [346] conv:(3.29)
+ 88. PATATAS TODO USO=t CHAMPIÑONES=t PUERROS=t 1148 ==> ZANAHORIAS=t 1040    <conf:(0.91)> lift:(1.31) lev:(0.03) [249] conv:(3.28)
+ 89. MANDARINAS POSTRE=t PATATAS TODO USO=t PUERROS=t 1369 ==> ZANAHORIAS=t 1240    <conf:(0.91)> lift:(1.31) lev:(0.03) [296] conv:(3.28)
+ 90. LECHE UHT ENTERA=t CEBOLLAS AMARILLAS=t PUERROS=t 1071 ==> ZANAHORIAS=t 970    <conf:(0.91)> lift:(1.31) lev:(0.03) [232] conv:(3.27)
+ 91. PUERROS=t BROCOLIS=t 1540 ==> ZANAHORIAS=t 1394    <conf:(0.91)> lift:(1.31) lev:(0.04) [333] conv:(3.26)
+ 92. CALABACINES=t CEBOLLAS AMARILLAS=t CHAMPIÑONES=t 1313 ==> ZANAHORIAS=t 1188    <conf:(0.9)> lift:(1.31) lev:(0.03) [283] conv:(3.24)
+ 93. PLATANOS DE CANARIAS=t CALABACINES=t PUERROS=t 1815 ==> ZANAHORIAS=t 1642    <conf:(0.9)> lift:(1.31) lev:(0.04) [391] conv:(3.24)
+ 94. CALABACINES=t PECHUGA DE PAVO=t PUERROS=t 1225 ==> ZANAHORIAS=t 1108    <conf:(0.9)> lift:(1.31) lev:(0.03) [264] conv:(3.23)
+ 95. CALABACINES=t PUERROS=t ATUN CLARO EN ACEITE OLIVA=t 1223 ==> ZANAHORIAS=t 1106    <conf:(0.9)> lift:(1.31) lev:(0.03) [263] conv:(3.22)
+ 96. MANDARINAS POSTRE=t AGUACATES=t PUERROS=t 1160 ==> ZANAHORIAS=t 1049    <conf:(0.9)> lift:(1.31) lev:(0.03) [249] conv:(3.22)
+ 97. AGUACATES=t CHAMPIÑONES=t PUERROS=t 1073 ==> ZANAHORIAS=t 970    <conf:(0.9)> lift:(1.31) lev:(0.03) [230] conv:(3.21)
+ 98. CALABACINES=t CEBOLLAS AMARILLAS=t TOMATES ENSALADA=t 1258 ==> ZANAHORIAS=t 1137    <conf:(0.9)> lift:(1.31) lev:(0.03) [270] conv:(3.21)
+ 99. PLATANOS DE CANARIAS=t AGUACATES=t PUERROS=t 1286 ==> ZANAHORIAS=t 1162    <conf:(0.9)> lift:(1.31) lev:(0.03) [275] conv:(3.2)
+100. PATATAS TODO USO=t CEBOLLAS AMARILLAS=t PUERROS=t 1481 ==> ZANAHORIAS=t 1338    <conf:(0.9)> lift:(1.31) lev:(0.03) [317] conv:(3.2)
+101. MANZANAS DULCES GOLDEN=t MANDARINAS POSTRE=t PUERROS=t 1118 ==> ZANAHORIAS=t 1010    <conf:(0.9)> lift:(1.31) lev:(0.03) [239] conv:(3.19)
+102. P.H. SECO BASICO 2C LARGO=t PUERROS=t JUDIAS PLANAS=t 1012 ==> ZANAHORIAS=t 914    <conf:(0.9)> lift:(1.31) lev:(0.02) [216] conv:(3.18)
+103. LECHE UHT ENTERA=t CALABACINES=t PUERROS=t 1216 ==> ZANAHORIAS=t 1098    <conf:(0.9)> lift:(1.31) lev:(0.03) [260] conv:(3.18)
+104. CALABACINES=t LECHUGAS=t PUERROS=t 1369 ==> ZANAHORIAS=t 1236    <conf:(0.9)> lift:(1.31) lev:(0.03) [292] conv:(3.18)
+105. PATATAS TODO USO=t PUERROS=t ENTERO NATURAL=t 1019 ==> ZANAHORIAS=t 920    <conf:(0.9)> lift:(1.31) lev:(0.02) [217] conv:(3.17)
+106. PLATANOS DE CANARIAS=t MANDARINAS POSTRE=t PUERROS=t 1533 ==> ZANAHORIAS=t 1384    <conf:(0.9)> lift:(1.31) lev:(0.04) [327] conv:(3.18)
+107. PERAS CONFERENCIA=t PUERROS=t 1423 ==> ZANAHORIAS=t 1284    <conf:(0.9)> lift:(1.31) lev:(0.03) [303] conv:(3.16)
+108. PATATAS TODO USO=t PUERROS=t TOMATES ENSALADA=t 1167 ==> ZANAHORIAS=t 1053    <conf:(0.9)> lift:(1.31) lev:(0.03) [248] conv:(3.16)
+109. PATATAS TODO USO=t ARROZ REDONDO=t PUERROS=t 1105 ==> ZANAHORIAS=t 997    <conf:(0.9)> lift:(1.31) lev:(0.03) [235] conv:(3.15)
+110. HUEVOS FRESCOS JAULA TALLA L=t PUERROS=t 1238 ==> ZANAHORIAS=t 1117    <conf:(0.9)> lift:(1.31) lev:(0.03) [264] conv:(3.16)
+111. PLATANOS DE CANARIAS=t PIMIENTOS ROJOS=t CALABACINES=t 1064 ==> ZANAHORIAS=t 960    <conf:(0.9)> lift:(1.31) lev:(0.02) [226] conv:(3.15)
+112. CALABACINES=t ENTERO DE SABORES=t PUERROS=t 1144 ==> ZANAHORIAS=t 1032    <conf:(0.9)> lift:(1.31) lev:(0.03) [243] conv:(3.15)
+113. MANDARINAS POSTRE=t LECHUGAS=t PUERROS=t 1122 ==> ZANAHORIAS=t 1012    <conf:(0.9)> lift:(1.31) lev:(0.03) [238] conv:(3.14)
+114. PLATANOS DE CANARIAS=t ARROZ REDONDO=t PUERROS=t 1162 ==> ZANAHORIAS=t 1048    <conf:(0.9)> lift:(1.31) lev:(0.03) [247] conv:(3.14)
+115. MANDARINAS POSTRE=t CALABAZAS=t 1087 ==> ZANAHORIAS=t 980    <conf:(0.9)> lift:(1.31) lev:(0.03) [231] conv:(3.13)
+116. MANZANAS DULCES GOLDEN=t P.H. SECO BASICO 2C LARGO=t PUERROS=t 1030 ==> ZANAHORIAS=t 928    <conf:(0.9)> lift:(1.31) lev:(0.02) [218] conv:(3.11)
+117. P.H. SECO BASICO 2C LARGO=t AGUACATES=t PUERROS=t 1070 ==> ZANAHORIAS=t 964    <conf:(0.9)> lift:(1.31) lev:(0.02) [226] conv:(3.11)
+118. CALABACINES=t CEBOLLAS AMARILLAS=t PIMIENTOS VERDES=t 1498 ==> ZANAHORIAS=t 1349    <conf:(0.9)> lift:(1.31) lev:(0.03) [316] conv:(3.11)
+119. PIMIENTOS ROJOS=t CALABACINES=t PIMIENTOS VERDES=t 1246 ==> ZANAHORIAS=t 1122    <conf:(0.9)> lift:(1.31) lev:(0.03) [263] conv:(3.1)
+120. PUERROS=t GUISANTE=t 1095 ==> ZANAHORIAS=t 986    <conf:(0.9)> lift:(1.31) lev:(0.03) [231] conv:(3.1)
+121. CALABACINES=t LONCHAS PORCION NACIONAL=t PUERROS=t 1033 ==> ZANAHORIAS=t 930    <conf:(0.9)> lift:(1.31) lev:(0.02) [218] conv:(3.09)
+
