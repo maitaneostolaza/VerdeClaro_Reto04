@@ -110,5 +110,3 @@ function(cliente_id){
     producto_olvidado_nombre = nombre_prod
   ))
 }
-
-Subir a main
