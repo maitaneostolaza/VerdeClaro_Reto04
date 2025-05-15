@@ -35,50 +35,24 @@ max(compras_por_producto) #22228
 # filtramos df porque minimo los clientes hayan comprado la media de compras por cliente
 # y los productos porque minimo hayan comprado la media de compras por producto
 # ---------- CLIENTES
-clientes_validos <- compras_por_cliente >= media_clientes
+clientes_validos <- compras_por_cliente >= 120
 df_reducido_clien <- df_numeric[clientes_validos, ]
 
 # Recalcular compras por producto tras filtrar clientes
 compras_por_producto_filtrado <- colSums(df_reducido_clien, na.rm = TRUE)
 
 #---------- PRODUCTOS
+<<<<<<< HEAD
 productos_validos <- compras_por_producto_filtrado >= 2000
+=======
+productos_validos <- compras_por_producto_filtrado >= 1000
+>>>>>>> 35f53198c60e3923c78bd5b09f2808c5679f1232
 df_reducido <- df_reducido_clien[, productos_validos]
-
-# ----------- COMPROBAMOS REDUCCION
 dim(df_reducido)
 
-# vamos a reducir todavia más la matriz porque tarda mucho
-# Total de productos comprados por cada cliente
-compras_por_cliente_reducido <- rowSums(df_reducido, na.rm = TRUE)
-media_clientes_reducido <- mean(compras_por_cliente_reducido) #175.5105
-max(compras_por_cliente_reducido) # 1706
-min(compras_por_cliente_reducido) # 72
-
-# Total de veces que se compró cada producto (columnas)
-compras_por_producto_reducido <- colSums(df_reducido, na.rm = TRUE)
-media_productos_reducido <- mean(compras_por_producto_reducido) #1409.497
-min(compras_por_producto_reducido) # 1413
-max(compras_por_producto_reducido) #20970
-
-
-# --------------- VUELTA A LA REDUCCION
-clientes_validos2 <- compras_por_cliente_reducido >= 100
-df_reducido_clien2 <- df_reducido [clientes_validos2, ]
-
-# Recalcular compras por producto tras filtrar clientes
-compras_por_producto_filtrado2 <- colSums(df_reducido_clien2, na.rm = TRUE)
-mean(compras_por_producto_filtrado2)
-
-#---------- PRODUCTOS
-productos_validos2 <- compras_por_producto_filtrado2 >= 2000
-df_reducido2 <- df_reducido_clien2[, productos_validos2] 
-
-# comprobamos: 
-dim(df_reducido2) # bien reducido
 
 # ahora si, convertimos a matriz
-matriz <- as.matrix(df_reducido2)
+matriz <- as.matrix(df_reducido)
 saveRDS(matriz,"Datos/Resultados/Matriz_red_comp_algos.rds")
 
 # hay que preparar ese archivo para llevarlo a weka
