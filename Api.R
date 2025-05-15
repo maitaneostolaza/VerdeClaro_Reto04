@@ -4,155 +4,111 @@ library(tidyr)
 library(readr)
 library(purrr)
 
-# Cargar datos
-tickets <- readRDS("Datos/Transformados/tickets_Reducidos.rds")
-objetivos <- readRDS("Datos/Originales/objetivos.RDS")
-maestro <- readRDS("Datos/Originales/maestroestr.RDS")
-
-# Extraer objetivos
-objetivo1 <- objetivos$objetivo1$obj
-objetivo2 <- objetivos$objetivo2$obj
-objetivo3 <- objetivos$objetivo3$obj
-objetivo4 <- objetivos$objetivo4$obj
+# Cargar datos de resultados finales
+resultado1 <- readRDS("Datos/Resultados/Objetivo1_resultado.rds")
+resultado2 <- readRDS("Datos/Resultados/Objetivo2_resultado.rds")
+resultado3 <- readRDS("Datos/Resultados/Objetivo3_resultado.rds")
+resultado4 <- readRDS("Datos/Resultados/Objetivo4_resultado.rds")
+maestro    <- readRDS("Datos/Originales/maestroestr.RDS")
 
 
-#* Recomendación: artículo promocionado
-#* @get /recomendar_promocion
+#* Recomendación: artículo promocionado (Objetivo 1 adaptado)
+#* @get recomendar_promocion
 function(){
-  prod <- objetivo1[1]
+  # El nombre del producto está como rowname o primera columna
+  nombre_prod <- rownames(resultado1)[1]
+  if (is.null(nombre_prod)) {
+    nombre_prod <- resultado1[1, 1]
+  }
   
-  top_clientes <- tickets %>%
-    filter(cod_est == prod) %>%
-    count(id_cliente_enc, sort = TRUE) %>%
-    slice_head(n = 10) %>%
-    pull(id_cliente_enc)
+  # Obtener los clientes (valores de la fila, excepto la 1ª si es nombre)
+  clientes <- as.character(resultado1[1, ])
+  clientes <- clientes[clientes != nombre_prod]  # eliminar el nombre del producto si aparece como valor
   
-  nombre_prod <- maestro %>%
-    filter(cod_est == prod) %>%
-    pull(descripcion)
+  # Buscar código del producto a partir del nombre (en maestro)
+  cod_prod <- maestro %>%
+    filter(descripcion == nombre_prod) %>%
+    pull(cod_est)
   
   return(list(
-    producto_promocionado_cod = prod,
+    producto_promocionado_cod = cod_prod,
     producto_promocionado_nombre = nombre_prod,
-    clientes_recomendados = top_clientes
+    clientes_recomendados = clientes
   ))
 }
 
 
-#* Recomendación: otros como tú han comprado
+
+#* Recomendación: otros como tú han comprado (Objetivo 2)
 #* @param cliente_id ID del cliente
-#* @get /recomendar_otros_como_tu
+#* @get recomendar_otros_como_tu
 function(cliente_id){
-  if (!(cliente_id %in% objetivo2)) {
-    return(list(error = "Cliente no está en la lista objetivo2."))
+  if (!"Id_cliente" %in% colnames(resultado2) || !"cod_est" %in% colnames(resultado2)) {
+    return(list(error = "Estructura incorrecta del archivo Objetivo2_resultado.rds"))
   }
   
-  productos_cliente <- tickets %>%
-    filter(id_cliente_enc == cliente_id) %>%
-    pull(cod_est) %>% unique()
+  fila <- resultado2 %>% filter(Id_cliente == cliente_id)
   
-  productos_similares <- tickets %>%
-    filter(id_cliente_enc %in% objetivo2, !(cod_est %in% productos_cliente)) %>%
-    count(cod_est, sort = TRUE)
-  
-  if (nrow(productos_similares) == 0) {
-    return(list(error = "No hay productos nuevos para recomendar a este cliente."))
+  if (nrow(fila) == 0) {
+    return(list(error = "Cliente no encontrado en el objetivo 2."))
   }
   
-  cod_recomendado <- productos_similares %>%
-    slice_head(n = 1) %>%
-    pull(cod_est)
-  
-  nombre_prod <- maestro %>%
-    filter(cod_est == cod_recomendado) %>%
-    pull(descripcion)
+  cod_prod <- fila$cod_est[1]
+  nombre_prod <- fila$descripcion[1]
   
   return(list(
     cliente = cliente_id,
-    producto_recomendado_cod = cod_recomendado,
+    producto_recomendado_cod = cod_prod,
     producto_recomendado_nombre = nombre_prod
   ))
 }
 
 
-#* Recomendación: producto en oferta más adecuado
+#* Recomendación: producto en oferta más adecuado (Objetivo 3)
 #* @param cliente_id ID del cliente
-#* @get /recomendar_oferta
+#* @get recomendar_oferta
 function(cliente_id){
-  productos_cliente <- tickets %>%
-    filter(id_cliente_enc == cliente_id) %>%
-    pull(cod_est) %>% unique()
-  
-  productos_posibles <- setdiff(objetivo3, productos_cliente)
-  
-  recomendacion <- tickets %>%
-    filter(cod_est %in% productos_posibles) %>%
-    count(cod_est, sort = TRUE) %>%
-    slice_head(n = 1) %>%
-    pull(cod_est)
-  
-  if (length(recomendacion) == 0) {
-    return(list(cliente = cliente_id, mensaje = "No se ha encontrado ningún producto en oferta adecuado."))
+  if (!"Id_cliente" %in% colnames(resultado3) || !"cod_est" %in% colnames(resultado3)) {
+    return(list(error = "Estructura incorrecta del archivo Objetivo3_resultado.rds"))
   }
   
-  nombre_prod <- maestro %>%
-    filter(cod_est == recomendacion) %>%
-    pull(descripcion)
+  fila <- resultado3 %>% filter(Id_cliente == cliente_id)
+  
+  if (nrow(fila) == 0) {
+    return(list(error = "Cliente no encontrado en el objetivo 3."))
+  }
+  
+  cod_prod <- fila$cod_est[1]
+  nombre_prod <- fila$descripcion[1]
   
   return(list(
     cliente = cliente_id,
-    producto_en_oferta_cod = recomendacion,
+    producto_en_oferta_cod = cod_prod,
     producto_en_oferta_nombre = nombre_prod
   ))
 }
 
 
-#* Recomendación: ítem olvidado (con nombre del producto)
+#* Recomendación: ítem olvidado (Objetivo 4)
 #* @param cliente_id ID del cliente
-#* @get /recomendar_olvido
+#* @get recomendar_olvido
 function(cliente_id){
-  if (!(cliente_id %in% objetivo4)) {
-    return(list(error = "Cliente no en lista de objetivo 4"))
+  fila <- resultado4 %>% filter(id_cliente_enc == cliente_id)
+  
+  if (nrow(fila) == 0) {
+    return(list(error = "Cliente no encontrado en el objetivo 4."))
   }
   
-  historial <- tickets %>%
-    filter(id_cliente_enc == cliente_id)
-  
-  ultima_fecha <- max(historial$dia)
-  ultima_cesta <- historial %>%
-    filter(dia == ultima_fecha) %>%
-    pull(cod_est) %>%
-    unique()
-  
-  productos_anteriores <- historial %>%
-    filter(dia < ultima_fecha) %>%
-    pull(cod_est) %>%
-    unique()
-  
-  olvidados <- setdiff(productos_anteriores, ultima_cesta)
-  
-  olvidados_freq <- historial %>%
-    filter(cod_est %in% olvidados, dia < ultima_fecha) %>%
-    count(cod_est) %>%
-    filter(n >= 2) %>%
-    arrange(desc(n))
-  
-  if (nrow(olvidados_freq) == 0) {
-    return(list(cliente = cliente_id, mensaje = "No se ha detectado ningún producto olvidado."))
-  }
-  
-  producto_final_cod <- olvidados_freq %>%
-    slice_head(n = 1) %>%
-    pull(cod_est)
-  
+  cod_prod <- fila$cod_est[1]
   nombre_prod <- maestro %>%
-    filter(cod_est == producto_final_cod) %>%
+    filter(cod_est == cod_prod) %>%
     pull(descripcion)
   
   return(list(
     cliente = cliente_id,
-    producto_olvidado_cod = producto_final_cod,
+    producto_olvidado_cod = cod_prod,
     producto_olvidado_nombre = nombre_prod
   ))
 }
 
+Subir a main
