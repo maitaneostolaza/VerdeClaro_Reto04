@@ -5,7 +5,19 @@ library(Matrix)
 
 # DESCARGAMOS LA MATRIZ
 matriz_general <- readRDS("Datos\\Resultados\\Matriz.rds")
+rownames(matriz_general) <- matriz_general[,1]
+matriz_general <- matriz_general[,-1]
+storage.mode(matriz_general) <- "numeric"
+matriz_sparse <- as(as.matrix(matriz_general), "dgCMatrix")
+matriz_rec <- as(matriz_sparse, "realRatingMatrix")
 
+# sacamos estadisticos
+colCounts(matriz_rec) %>% 
+  as("matrix") 
+hist(getRatings(matriz_rec))
+recuentoF <- rowCounts(matriz_rec) # cuantas celditas de una fila son diferentes de NA (cuantas pelis ha valorado cada usuario)
+recuentoC <- mean(colCounts(matriz_rec))
+hist(rowCounts(matriz_rec))
 
 # convertimos a data frame para que podamos convertir la columna cliente_id a nombres de fila
 df <- as.data.frame(matriz_general)
@@ -90,6 +102,7 @@ set.seed(8)
 eval_scheme <- evaluationScheme(matriz_rec, method = "split",
                                 train = 0.8, given= 5,
                                 goodRating = 1)
+min(Rowsums(matriz_rec))
 
 # -------------------------- ENTRENAR MODELOS :
 algos <- list("random" = list(name = "RANDOM", param = NULL),
@@ -101,7 +114,7 @@ algos <- list("random" = list(name = "RANDOM", param = NULL),
 
 # ----------- TOPNLIST
 eval <- evaluate(eval_scheme, algos, type = "topNList", n = c(1,3,5,10,15,20))
-plot(eval) # a priori no hay mucha diferencia entre los algoritmos
+plot(eval[c(1,5,6)]) # a priori no hay mucha diferencia entre los algoritmos
 
 # ---- SACAMOS PARAMETROS PARA COMPRAR ALGORITMOS: 
 
@@ -115,18 +128,44 @@ CM_SVDF_10 <- getConfusionMatrix(eval[["svdf_10"]])[[1]]
 # ----------------- RATINGS
 eval_ratings <- evaluate(eval_scheme, algos, type = "ratings", n = c(1,3,5,10,15,20))
 
-avg(eval_ratings[["random"]])
-avg(eval_ratings[["UBCF_10nn"]])
+random_ratings <- avg(eval_ratings[["random"]])
+random_user <- avg(eval_ratings[["UBCF_10nn"]])
 avg(eval_ratings[["UBCF_50nn"]])
 avg(eval_ratings[["IBCF_Pearson"]])
-avg(eval_ratings[["popular"]])
-avg(eval_ratings[["svdf_10"]])
+popular_ratings <- avg(eval_ratings[["popular"]])
+svdf_ratings <- avg(eval_ratings[["svdf_10"]])
 
 
-################### GRAFICOS PARA LA COMPARACION DE ALGORITMOS: 
-sum(!is.na(matriz_rec)) / (nrow(matriz_rec) * ncol(matriz_rec))
-recs <- predict(Recommender(getData(eval_scheme, "train"), method = "UBCF", param = list(nn = 50)),
-                getData(eval_scheme, "known"), type = "topNList", n = 10)
+################### GRAFICOS PARA LA COMPARACION DE ALGORITMOS:
+library(plotly)
+library(dplyr)
+df <- data.frame("random" = random_ratings,
+                 "scdf" = svdf_ratings)
 
-# Verifica cuántas recomendaciones hay por usuario
-summary(recs)
+df <- rbind(random_ratings,svdf_ratings)
+rownames(df) <- c("random","svdf")
+
+algoritmos <- c("random", "svdf")
+rmse <- c(25.956922, 2.700269)
+mse <- c(673.761809, 7.291451)
+mae <- c(22.165161, 1.765982)
+
+# Preparar dataframe para plotly
+df <- data.frame(
+  algoritmo = rep(algoritmos, times = 3),
+  metrica = rep(c("RMSE", "MSE", "MAE"), each = 2),
+  valor = c(rmse, mse, mae)
+)
+
+plot_ly(df, x = ~algoritmo, y = ~valor, 
+        color = ~metrica, colors = c("#E10A23","#005B92","#FFD5D1"),
+        type = 'bar', barmode = 'group') %>%
+  layout(
+    title = "Comparación de métricas de error por algoritmo",
+    xaxis = list(title = "Algoritmo"),
+    yaxis = list(title = "Valor"),
+    legend = list(title = list(text = 'Algoritmo'))
+  )
+
+
+
