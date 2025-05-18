@@ -169,3 +169,5 @@ plot_ly(df, x = ~algoritmo, y = ~valor,
 
 
 
+
+

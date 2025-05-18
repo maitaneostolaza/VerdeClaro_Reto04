@@ -168,56 +168,6 @@ saveRDS(objetivo3_resultado,"Datos\\Resultados\\Objetivo3_resultado.rds")
 ################################# OBJETIVO 4 ###################################
 obj4<-objetivos[[4]]$obj
 
-tickets_filtrados <- tickets[tickets$id_cliente_enc %in% obj4, ]
-
-ultimos_tickets <- tickets_filtrados %>%
-  group_by(id_cliente_enc) %>%
-  filter(dia == max(dia)) %>%
-  ungroup()
-
-historial_tickets <- anti_join(tickets_filtrados, ultimos_tickets, by = "num_ticket")
-
-
-tickets_matriz_agrupado <- historial_tickets %>%
-  group_by(id_cliente_enc, cod_est) %>%
-  summarise(N_compras = n(), .groups = "drop")
-
-df_matriz <- pivot_wider(
-  tickets_matriz_agrupado, 
-  names_from = "cod_est", 
-  values_from = "N_compras", 
-  values_fill = 0,
-  names_prefix = "id_"
-)
-
-matriz_sparse_o4 <- as(as.matrix(df_matriz[,-1]), "dgCMatrix")
-rownames(matriz_sparse_o4) <- df_matriz$id_cliente_enc
-
-
-modelo_wrmf_o4 <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
-modelo_wrmf_o4$fit_transform(matriz_sparse_o4, n_iter = 1000L, convergence_tol = 1e-6)
-
-preds_o4 <- modelo_wrmf_o4$predict(matriz_sparse_o4, k = 1)
-
-clientes <- rownames(matriz_sparse_o4)
-productos_predichos <- attr(preds_o4, "ids")
-
-recomendaciones_o4 <- data.frame(
-  id_cliente_enc = clientes,
-  producto_olvidado = productos_predichos
-)
-
-recomendaciones_o4 <- recomendaciones_o4 %>%
-  mutate(cod_est = str_remove(producto_olvidado, "id_")) %>%
-  left_join(productos %>% select(cod_est, descripcion), by = "cod_est") %>%
-  select(id_cliente_enc, cod_est, descripcion)
-
-# guardamos el df
-saveRDS(recomendaciones_o4,"Datos\\Resultados\\Objetivo4_resultado.rds")
-
-
-##################### segunda prueba objetivo 4
-
 # Creo una lista vacia y en el bucle itero cada usuario del objetivo buscando 
 # la última compra realizada y guardando en la lista un df con la cantidad de 
 # cada producto comprado ese dia
@@ -253,6 +203,7 @@ for (cliente in obj4) {
 
 mo4 <- as(mo4, "sparseMatrix")
 
+modelo_wrmf$fit_transform(matriz_general, n_iter = 1000L, convergence_tol=0.000001) 
 preds_o4 <- modelo_wrmf$predict(mo4, k = 1, not_recommend = mo4)
 preds_o4
 attr_preds_o4 <- attr(preds_o4,'ids')
@@ -262,3 +213,45 @@ preds_o4_df <- data.frame(id_cliente_enc = rownames(attr_preds_o4),
 preds_o4_nombres <- inner_join(preds_o4_df, productos, by = "cod_est")
 preds_o4_nombres
 saveRDS(preds_o4_nombres, "Datos/Resultados/Objetivo4_resultado.rds")
+
+
+############################### COMPROBACIONES #################################
+# 1. CREAMOS LAS MATRICES DE FACTORES LATENTES: 
+user_emb <- modelo_wrmf$fit_transform(matriz_general) # matriz de factores de los usuarios
+user_emb; dim(user_emb) #22718 cliente 10 productos
+
+su <- similarity(as(user_emb,"realRatingMatrix"))
+item_emb <- modelo_wrmf$components # matriz de factores de los items
+item_emb
+dim(item_emb)
+item_emb_n <- t(modelo_wrmf$components)
+
+
+# -------------------------------- OBJETIVO 1: 
+# para este objetivo como el modelo se ha realizado con la matriz alreves, creamos
+# de nuevo las matrices de usuarios y productos para este objetivo
+item_emb_obj1 <- modelo_wrmf_alreves$fit_transform(matriz_alreves)
+user_emb_obj1 <- modelo_wrmf_alreves$components
+
+user_emb_obj1_n <- t(user_emb_obj1)
+item_emb_obj1_n <- t(item_emb_obj1)
+
+# 10 usuarios para recomendar masa de pizza --> 14351005
+objetivos$objetivo1$obj
+
+comprobacion1 <- user_emb_obj1_n%*%item_emb_obj1_n[,colnames(item_emb_obj1_n)=="14351005"]%>% 
+  sort(decreasing=TRUE, index.return = T)
+comprobacion1$ix[1:10]
+comprobacion1_df <- data.frame(valoracion = comprobacion1$x, usuario = rownames(user_emb_obj1_n)[comprobacion1$ix])
+comprobacion1_df[1:10,] # usuarios que comprarian la masa de pizza
+
+
+objetivo1 <- readRDS("Datos\\Resultados\\Objetivo1_resultado.rds")
+
+# respuesta: mitad si mitad no
+
+
+
+# --------------------------------------- OBJETIVO 2: 
+
+
