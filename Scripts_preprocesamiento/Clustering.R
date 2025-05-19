@@ -206,6 +206,20 @@ media_clusteres <- df_entero %>%
   group_by(cluster) %>%
   summarise(across(where(is.numeric), mean))
 
+media_clusteres$media_unidades_por_compra <- round(media_clusteres$media_de_dias_pasadas_por_compras,3)
+media_clusteres$media_de_dias_pasadas_por_compras <- round(media_clusteres$media_de_dias_pasadas_por_compras,3)
+media_clusteres$total_veces_que_ha_comprado <- round(media_clusteres$total_veces_que_ha_comprado,3)
+
+saveRDS(media_clusteres,"Datos/Resultados/Centroides_clusteres.rds")
+
+medias <- readRDS("Datos/Resultados/Centroides_clusteres.rds")
+
+media1 <- mean(medias$media_unidades_por_compra)
+media2 <- mean(medias$media_de_dias_pasadas_por_compras)
+media3 <- mean(medias$total_veces_que_ha_comprado)
+mean(media1,media2,media3) # centroide de todo el dataset (data mining)
+
+
 productos_menos_comprados <- df_entero %>% 
   group_by(cluster,producto_general) %>% 
   summarise(cantidad_producto = n()) %>% 

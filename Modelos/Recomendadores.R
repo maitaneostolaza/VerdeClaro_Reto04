@@ -245,13 +245,20 @@ comprobacion1$ix[1:10]
 comprobacion1_df <- data.frame(valoracion = comprobacion1$x, usuario = rownames(user_emb_obj1_n)[comprobacion1$ix])
 comprobacion1_df[1:10,] # usuarios que comprarian la masa de pizza
 
-
 objetivo1 <- readRDS("Datos\\Resultados\\Objetivo1_resultado.rds")
 
 # respuesta: mitad si mitad no
 
-
-
 # --------------------------------------- OBJETIVO 2: 
+comprobacion2 <- user_emb[rownames(user_emb) %in% objetivos$objetivo2$obj,] %*% item_emb[] %>% 
+  sort(decreasing = T, index.return = T)
+comprobacion2_df <- data.frame(valoracion = comprobacion2$x, usuario = colnames(item_emb)[comprobacion2$ix])
+
+
+
+
+
+
+
 
 

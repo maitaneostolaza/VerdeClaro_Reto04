@@ -11,6 +11,25 @@ storage.mode(matriz_general) <- "numeric"
 matriz_sparse <- as(as.matrix(matriz_general), "dgCMatrix")
 matriz_rec <- as(matriz_sparse, "realRatingMatrix")
 
+
+
+
+dim(matriz_rec)
+summary(colSums(matriz_general, na.rm=T))
+hist(colSums(matriz_general,na.rm=T))
+hist(rowSums(matriz_general,na.rm=T))
+summary(colCounts(matriz_rec,na.rm=T))
+summary(rowCounts(matriz_rec,na.rm=T))
+hist(colCounts(matriz_general))
+hist(rowCounts(matriz_general))
+
+MRf1<-matriz_rec[,colCounts(matriz_rec)>80]#quitar los que tengan mas NA's que la media de NA's por columna
+MRf2<-MRf1[rowCounts(matriz_rec)>150,]#quitar los que tengan mas NA's que la media de NA's por fila
+dim(MRf2)
+
+
+
+
 # sacamos estadisticos
 colCounts(matriz_rec) %>% 
   as("matrix") 
@@ -98,6 +117,9 @@ matriz_rec <- as(matriz_sparse, "realRatingMatrix")
 
 set.seed(8)
 # --------------------------- TRAIN Y TEST
+
+hist(rowMeans(matriz_rec,na.rm=T))
+hist(colMeans(matriz_rec,na.rm=T))
 
 eval_scheme <- evaluationScheme(matriz_rec, method = "split",
                                 train = 0.8, given= 5,
