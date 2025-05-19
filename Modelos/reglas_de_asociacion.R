@@ -2,6 +2,7 @@ library(dplyr)
 library(tidyr)
 
 tickets <- readRDS("Datos\\Transformados\\tickets_limpios.rds")
+tickets <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
 productos <- readRDS("Datos\\Originales\\maestroestr.RDS")
 compras<-left_join(tickets, productos, by= "cod_est")
 compras<- compras[, c(2,5)]
@@ -33,10 +34,16 @@ colnames(compras) <- nuevos_nombres
 
 library(arules)
 transacciones <- as(compras, "transactions")
+# Eliminar productos con baja frecuencia (< 100 ocurrencias)
+item_freq <- itemFrequency(transacciones, type = "absolute")
+trans_filtradas <- transacciones[, item_freq >= 100]
 
-reglas <- apriori(transacciones, parameter = list(
-  support = 0.1,  # Aparece en al menos 14.678  tickets
-  confidence = 0.8,
+# aun siguen siendo demasiadas y R da problemas, asi que hay que reducir más
+
+
+reglas <- apriori(trans_filtradas, parameter = list(
+  support = 0.25,  # Aparece en al menos 29.356  tickets (10% del total)
+  confidence = 0.7,
   minlen = 2,  #reglas con al menos 2 items
   maxlen= 4, #maximo 4 items por regla
   target = "rules"
