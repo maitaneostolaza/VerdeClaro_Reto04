@@ -82,29 +82,6 @@ dim(df_reducido)
 matriz <- as.matrix(df_reducido)
 saveRDS(matriz,"Datos/Resultados/Matriz_red_comp_algos.rds")
 
-# hay que preparar ese archivo para llevarlo a weka
-
-library(foreign)
-matriz<- as.data.frame(matriz)
-codigos <- gsub("^X", "", colnames(matriz))
-
-tabla_nombres <- data.frame(
-  original = colnames(matriz),
-  cod_est = codigos
-) %>%
-  left_join(productos, by = "cod_est")
-
-nuevos_nombres <- ifelse(
-  is.na(tabla_nombres$descripcion),
-  tabla_nombres$original,
-  tabla_nombres$descripcion
-)
-
-colnames(matriz) <- nuevos_nombres
-matriz <- select(matriz, -TOSTADA)
-write.arff(matriz,file = "Datos/Resultados/Matriz_red_comp_algos.arff")
-
-
 
 ########################## COMPARACION ALGORITMOS ##############################
 
