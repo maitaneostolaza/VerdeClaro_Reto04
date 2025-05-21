@@ -17,6 +17,11 @@ matriz_general <- as(matriz,"sparseMatrix")
 # para el objetivo 1 cambiamos filas por columnas
 matriz_alreves <- t(matriz_general)
 
+
+saveRDS(matriz_general, "Datos\\Resultados\\matriz_general.rds")
+saveRDS(matriz_alreves, "Datos\\Resultados\\matriz_alreves.rds")
+
+
 # -- MODELO: 
 modelo_wrmf_alreves <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
 modelo_wrmf_alreves$fit_transform(matriz_alreves, n_iter = 1000L, convergence_tol=0.000001)
