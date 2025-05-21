@@ -145,7 +145,7 @@ saveRDS(preds_o4_nombres, "Datos/Resultados/Objetivo4_resultado.rds")
 # de nuevo las matrices de usuarios y productos para este objetivo
 item_emb_obj1 <- modelo_wrmf_alreves$fit_transform(matriz_alreves)
 user_emb_obj1 <- modelo_wrmf_alreves$components
-
+item_emb_obj1_n <- t(item_emb_obj1)
 
 comp1 <- item_emb_obj1[rownames(item_emb_obj1) == "14351005"]%*%user_emb_obj1 %>% 
   sort(decreasing=TRUE, index.return = T)
@@ -153,12 +153,28 @@ comp1_df <- data.frame(valoracion = comp1$x, usuario = colnames(user_emb_obj1)[c
 comp1_df[1:10,]
 objetivo1_resultado
 
-# ------------- CALCULAMOS SIMILITUD ENTRE USUARIOS PARA VER QUE AUNQUE EL PREDICT
-# Y LA MULTIPLICACION NO DE LO MISMO, LOS USUARIOS QUE PREDICE SE PARECEN CON LOS USUARIOS DE LA MULTIPLICACION
-matriz_similarity <- user_emb_obj1 %*% item_emb_obj1
+# ------------- vamos a ver si los clientes han comprado otros productos parecidos a la masa de pizza
+# calcular productos similares a la masa de pizza
+items_parecidos_masa_pizza <- item_emb_obj1[rownames(item_emb_obj1) == "14351005"]%*%item_emb_obj1_n %>% 
+  sort(decreasing = T,index.return = T)
+productos_masa_pizza_parecido <- colnames(item_emb_obj1_n)[items_parecidos_masa_pizza$ix[1:15]]
+productos_masa_pizza_parecido <- c(productos_masa_pizza_parecido,"08100110")
+productos_masa_pizza_parecido <- productos %>% filter(cod_est%in%productos_masa_pizza_parecido)
+productos_definitivos <- productos_masa_pizza_parecido %>% 
+  filter(descripcion %in% c("CHAMPIÑONES","LONCHAS PORCION INTERNACIONAL", "JAMON DE CERDO",
+                            "MEXICANA MASAS", "ROLLO COCINA LARGO",
+                            "TOMATE TRITURADO HASTA 500G"))
 
+# ver si a los clientes que se le ha recomendado la masa de pizza efectivamente
+# han comprado los productos que mas se parecen
+COMPROBACION_DEFINITIVA_OBJ1 <- as.matrix(matriz_general[rownames(matriz_general) %in% objetivo1_resultado, colnames(matriz_general) %in% productos_definitivos$cod_est])
+COMPROBACION_DEFINITIVA_OBJ1 <- as.data.frame(COMPROBACION_DEFINITIVA_OBJ1)
+colnames(COMPROBACION_DEFINITIVA_OBJ1) <- c("JAMON DE CERDO", "LONCHAS PORCION INTERNACIONAL",
+                                            "MEXICANA MASAS", "ROLLO COCINA LARGO",
+                                            "CHAMPIÑONES","TOMATE TRITURADO HASTA 500G")
 
-
+# guardamos rds: 
+saveRDS(COMPROBACION_DEFINITIVA_OBJ1,"Datos\\Resultados\\comprobacion_objetivo1.rds")
 
 # --------------------------------------- OBJETIVO 2: 
 user_emb <- modelo_wrmf$fit_transform(matriz_general) # matriz de factores de los usuarios
@@ -199,12 +215,8 @@ verificar_predicciones <- function(matriz, users, items, prediccion, rerecomend)
 matriz_obj2 <- as.matrix(matriz_obj2)
 verificar_predicciones(matriz_obj2,user_emb,item_emb, objetivo2_resultado, rerecomend = F)
 
-# mirar que items se parecen a los que ha predecido el usuario
-comp2_item <- item_emb[,colnames(item_emb) %in% objetivo2_resultado$cod_est] %*% item_emb[] %>% 
-  sort(decreasing = T, index.return = T)
-
-data.frame(valoracion = comp2_item$x, item = colnames(item_emb)[comp2_item$ix])
-
+# mirar que items se parecen a los que ha predecido el usuario (cogemos los 15 productos mas similares)
+colnames(objetivo2_resultado) <- c("cliente", "item_origen", "descripcion")
 # Función de normalización
 normalize <- function(x) x / sqrt(sum(x^2))
 
@@ -212,7 +224,7 @@ normalize <- function(x) x / sqrt(sum(x^2))
 item_emb_norm <- apply(item_emb, 2, normalize)
 
 # Ítems objetivos
-target_items <- colnames(item_emb) %in% objetivo2_resultado$cod_est
+target_items <- colnames(item_emb) %in% objetivo2_resultado$item_origen
 filtered_items <- colnames(item_emb)[target_items]
 
 # Inicializamos resultado
@@ -234,14 +246,12 @@ for (item in filtered_items) {
   sim[item] <- NA
   
   # Obtenemos el ítem más parecido
-  mejor_item <- names(which.max(sim))
-  mejor_score <- max(sim, na.rm = TRUE)
+  mejor_item <- names(sort(sim, decreasing = T))[1:15]
   
   # Añadimos al resultado
   resultados <- rbind(resultados, data.frame(
     item_origen = item,
     item_mas_parecido = mejor_item,
-    similitud = mejor_score,
     stringsAsFactors = FALSE
   ))
 }
@@ -251,15 +261,24 @@ print(resultados)
 
 # ahora miramos si este cliente ha comprado estos productos -->
 # añadimos a resultados el cliente:
-colnames(objetivo2_resultado) <- c("cliente", "item_origen", "descripcion") 
+ 
 df2 <- left_join(resultados,objetivo2_resultado, by = c("item_origen"))
-matriz_general %>% filter(cliente)
+comprobacion_items <- as.matrix(matriz_general[rownames(matriz_general) %in% unique(df2$cliente), colnames(matriz_general) %in% df2$item_mas_parecido])
+
+# Creamos una lista donde cada elemento es un cliente con los productos comprados
+lista_compras <- apply(comprobacion_items, 1, function(x) {
+  names(x)[x == 1]
+})
+
+# Convertimos en lista nombrada (por si pierde nombres)
+names(lista_compras) <- rownames(comprobacion_items)
+print(lista_compras)
 
 
 # ----------------------------------- OBJETIVO 3: 
 # las matrices de usuario e item son iguales que para el objetivo 2
 # recomendarle de 20 productos uno de ellos al usuario
-user_emb <- user_emb[!rownames(user_emb) == "7776d22e65bc7a561b34457b4effb747",]
+user_emb_obj3 <- user_emb[!rownames(user_emb) == "7776d22e65bc7a561b34457b4effb747",]
 
 scores <- user_emb %*% item_emb[, colnames(item_emb) %in% objetivos$objetivo3$obj]
 top_items_per_user <- apply(scores, 1, function(x) names(x)[which.max(x)])
@@ -274,4 +293,16 @@ comprobacion_obj3 == objetivo3_resultado2[,1:2]
 funcion_comprobacion(matriz_obj3,user_emb, item_emb, objetivo3_resultado,rerecomend = F)
 
 # ---------------------------------- OBJETIVO 4: 
+biderketa4 <- user_emb[rownames(user_emb) %in% objetivos$objetivo4$obj,] %*% item_emb[] 
+# Obtener los nombres de los ítems (columnas de item_emb)
+item_names <- colnames(item_emb)
+
+# Para cada usuario (fila), obtener el nombre del ítem con mayor score
+mejor_item_por_usuario <- apply(biderketa4, 1, function(fila) {
+  item_names[which.max(fila)]
+})
+
+# Resultado: named vector, donde nombre = usuario, valor = ítem más valorado
+as.data.frame(mejor_item_por_usuario)
+
 
