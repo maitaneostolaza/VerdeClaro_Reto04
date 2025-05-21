@@ -9,6 +9,8 @@ library(DT)
 library(lubridate)
 library(scales)
 
+options(scipen = 999)
+
 # ---------------- CARGA DE DATOS ---------------- #
 df_entero <- readRDS("Datos/Transformados/df_con_clusteres.rds")
 tickets <- readRDS("Datos/Transformados/tickets_limpios.rds")
@@ -346,36 +348,27 @@ server <- function(input, output, session) {
                        },
                        
                        "gx_top5_por_dia_con_cluster" = {
-                         df <- left_join(tickets, df_entero, by = "id_cliente_enc") %>%
-                           mutate(
-                             cod_est = as.character(cod_est),
-                             producto_general = case_when(
-                               grepl("^010\\d+", cod_est) ~ "Fruta y verdura",
-                               TRUE ~ "Otros"
-                             ),
-                             dia_semana = wday(dia, label = TRUE, abbr = FALSE, week_start = 1),
-                             dia_semana = factor(dia_semana,
-                                                 levels = c("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"))
-                           )
-                         
                          df %>%
                            filter(dia_semana != "domingo") %>%
                            group_by(dia_semana, producto_general) %>%
-                           summarise(ventas = n(), .groups = "drop") %>%
+                           summarise(cantidad_vendida = n(), .groups = "drop") %>%
                            group_by(dia_semana) %>%
-                           slice_max(ventas, n = 5) %>%
+                           slice_max(order_by = cantidad_vendida, n = 5) %>%
                            ungroup() %>%
-                           ggplot(aes(x = dia_semana, y = ventas, fill = producto_general)) +
-                           geom_col(position = "dodge") +
+                           ggplot(aes(x = dia_semana, y = cantidad_vendida, fill = producto_general)) +
+                           geom_col() +
                            coord_flip() +
                            labs(
-                             title = "Top 5 productos más vendidos por día de la semana (por cluster)",
-                             x = NULL, y = "Unidades", fill = "Categoría"
+                             title = "Top 5 productos más vendidos por día de la semana (sin domingos)",
+                             x = "Día de la semana",
+                             y = "Cantidad vendida",
+                             fill = "Producto general"
                            ) +
                            scale_fill_manual(values = eroski_palette_extended) +
                            theme_minimal() +
                            theme(axis.text.x = element_text(angle = 45, hjust = 1))
                        }
+                       
     )
     
     plot_obj
@@ -525,6 +518,3 @@ server <- function(input, output, session) {
 
 # --- Lanzar app ---
 shinyApp(ui = ui, server = server)
-
-
-
