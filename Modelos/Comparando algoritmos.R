@@ -173,7 +173,60 @@ plot_ly(df, x = ~algoritmo, y = ~valor,
 
 ################################# GRAFICAMOS ###################################
 # --------------------------------- RATINGS
-# Crear el data frame con las métricas
+
+# Crear el data frame con las métricas (con random)
+comparativa_errores <- data.frame(
+  Modelo = c("POPULAR",  "UBCF_5n","UBCF_10n","RANDOM", "IBCF", "SVDF_10","SVDF_40", "ALS"),
+  RMSE = c(popular_ratings[1],
+           UBCF_5nn_ratings[1],
+           UBCF_10nn_ratings[1],
+           random_ratings[1],
+           IBCF_ratings[1],
+           svdf_ratings_10[1],
+           SVDF_ratings_40[1],
+           ALS_ratings[1]),
+  MAE = c(popular_ratings[3],
+          UBCF_5nn_ratings[3],
+          UBCF_10nn_ratings[3],
+          random_ratings[3],
+          IBCF_ratings[3],
+          svdf_ratings_10[3],
+          SVDF_ratings_40[3],
+          ALS_ratings[3]),
+  MSE = c(popular_ratings[2],
+          UBCF_5nn_ratings[2],
+          UBCF_10nn_ratings[2],
+          random_ratings[2],
+          IBCF_ratings[2],
+          svdf_ratings_10[2],
+          SVDF_ratings_40[2],
+          ALS_ratings[2])
+)
+
+#Graficarlo (RMSE,MSE,MAE)
+library(ggplot2)
+library(tidyr)  
+
+comparativa_larga <- pivot_longer(comparativa_errores,
+                                  cols = c("RMSE", "MAE", "MSE"),
+                                  names_to = "Metrica",
+                                  values_to = "Valor")
+
+
+ggplot(comparativa_larga, aes(x = Modelo, y = Valor, fill = Metrica)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  labs(title = "Comparación de errores por modelo (Ratings)",
+       y = "Valor del error",
+       x = "Modelo",
+       fill = "Métrica") +
+  theme_minimal(base_size = 14) +
+  scale_fill_manual(values = c("RMSE" = "#B00A1C", "MAE" = "#005B92", "MSE" = "#FFD5D1")) +
+  theme(legend.position = "top")
+
+
+
+
+# Crear el data frame con las métricas (sin random)
 comparativa_errores <- data.frame(
   Modelo = c("POPULAR",  "UBCF_5n","UBCF_10n", "IBCF", "SVDF_10","SVDF_40", "ALS"),
   RMSE = c(popular_ratings[1],
@@ -220,7 +273,7 @@ ggplot(comparativa_larga, aes(x = Modelo, y = Valor, fill = Metrica)) +
   theme(legend.position = "top")
 
 
-# ----------------------------------------- RATINGS
+# ----------------------------------------- TOP N LIST
 # Obtener matriz de confusión para n=5 de cada algoritmo
 conf_matrix_n5_list <- lapply(eval, function(res) getConfusionMatrix(res, n = 5))
 
@@ -248,6 +301,7 @@ df_long <- pivot_longer(df_conf,
 
 ggplot(df_long, aes(x = Modelo, y = Valor, fill = Metrica)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  coord_flip() +
   labs(title = "Comparación de métricas para topNList (n=5)",
        x = "Modelo",
        y = "Valor Métrica",
@@ -260,3 +314,27 @@ ggplot(df_long, aes(x = Modelo, y = Valor, fill = Metrica)) +
                                "coverage" = "#FADED6")) +
   theme(legend.position = "top")
 
+df_roc <- df_long %>%
+  filter(Metrica %in% c("TPR", "FPR")) %>%
+  mutate(Metrica = tolower(Metrica))
+
+# 2. Añadir columna 'Paso' para diferenciar múltiples puntos por modelo
+df_roc <- df_roc %>%
+  group_by(Modelo, Metrica) %>%
+  mutate(Paso = row_number()) %>%
+  ungroup()
+
+# 3. Convertir a formato ancho para tener columnas 'tpr' y 'fpr'
+df_roc_wide <- df_roc %>%
+  pivot_wider(names_from = Metrica, values_from = Valor)
+
+# 4. Graficar la curva ROC: TPR vs FPR por modelo, conectando puntos en orden de 'Paso'
+ggplot(df_roc_wide, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Curva ROC: TPR vs FPR por Modelo",
+       x = "FPR (False Positive Rate)",
+       y = "TPR (True Positive Rate)",
+       color = "Modelo") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top")
