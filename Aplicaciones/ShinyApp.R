@@ -9,7 +9,6 @@ library(DT)
 library(lubridate)
 library(scales)
 
-
 # ---------------- CARGA DE DATOS ---------------- #
 df_entero <- readRDS("Datos/Transformados/df_con_clusteres.rds")
 tickets <- readRDS("Datos/Transformados/tickets_limpios.rds")
@@ -17,9 +16,14 @@ productos <- readRDS("Datos/Originales/maestroestr.RDS")
 tickets_enc <- readRDS("Datos\\Originales\\tickets_enc.RDS")
 eroski_palette_extended <- c(
   "#E10A23", "#B00A1C", "#F0928E", "#FFD5D1",
-  
   "#0074B5", "#005B92", "#A2CBE8", "#FADED6"
 )
+
+datos <- tickets_enc
+colnames(datos) <- c("fecha", "ticket", "cod_est", "id_cliente")
+datos$fecha <- ymd(datos$fecha)
+
+datos_enriquecidos <- left_join(datos, productos, by = "cod_est")
 
 # Unimos clusters al df de tickets
 df <- left_join(tickets, df_entero, by = "id_cliente_enc")
@@ -57,8 +61,12 @@ df <- df %>%
       grepl("^13\\d+", cod_est) ~ "Higiene",
       grepl("^14\\d+", cod_est) ~ "Platos preparados",
       TRUE ~ "Otros"
-    )
+    ),
+    fecha = ymd(dia),
+    dia_semana = wday(dia, label = TRUE, abbr = FALSE, week_start = 1),
+    dia_semana = factor(dia_semana, levels = c("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"))
   )
+
 
 df <- left_join(df, productos, by = "cod_est")
 
@@ -270,7 +278,7 @@ server <- function(input, output, session) {
     
     plot_obj <- switch(grafico,
                        "gx_top10_prod" = {
-                         datos_enriq %>%
+                         datos_enriquecidos %>%
                            count(descripcion, sort = TRUE) %>%
                            slice_max(n, n = 10) %>%
                            ggplot(aes(x = reorder(descripcion, n), y = n)) +
@@ -338,14 +346,14 @@ server <- function(input, output, session) {
                        },
                        
                        "gx_top5_por_dia_con_cluster" = {
-                         df <- left_join(tickets, df_entero, by = "id_cliente") %>%
+                         df <- left_join(tickets, df_entero, by = "id_cliente_enc") %>%
                            mutate(
                              cod_est = as.character(cod_est),
                              producto_general = case_when(
                                grepl("^010\\d+", cod_est) ~ "Fruta y verdura",
                                TRUE ~ "Otros"
                              ),
-                             dia_semana = wday(fecha, label = TRUE, abbr = FALSE, week_start = 1),
+                             dia_semana = wday(dia, label = TRUE, abbr = FALSE, week_start = 1),
                              dia_semana = factor(dia_semana,
                                                  levels = c("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"))
                            )
@@ -517,5 +525,6 @@ server <- function(input, output, session) {
 
 # --- Lanzar app ---
 shinyApp(ui = ui, server = server)
+
 
 
