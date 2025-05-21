@@ -192,13 +192,66 @@ verificar_predicciones <- function(matriz, users, items, prediccion, rerecomend)
 
 
 matriz_obj2 <- as.matrix(matriz_obj2)
-funcion_comprobacion(matriz_obj2,user_emb,item_emb, objetivo2_resultado, rerecomend = F)
-matriz_similarity <- user_emb %*% item_emb
-matriz_similarityM <- as(matriz_similarity, "realRatingMatrix")
-library(recommenderlab)
-sim <- similarity(matriz_similarityM)
+verificar_predicciones(matriz_obj2,user_emb,item_emb, objetivo2_resultado, rerecomend = F)
 
- # ----------------------------------- OBJETIVO 3: 
+# mirar que items se parecen a los que ha predecido el usuario
+comp2_item <- item_emb[,colnames(item_emb) %in% objetivo2_resultado$cod_est] %*% item_emb[] %>% 
+  sort(decreasing = T, index.return = T)
+
+data.frame(valoracion = comp2_item$x, item = colnames(item_emb)[comp2_item$ix])
+
+# Función de normalización
+normalize <- function(x) x / sqrt(sum(x^2))
+
+# Normalizamos todas las columnas de item_emb
+item_emb_norm <- apply(item_emb, 2, normalize)
+
+# Ítems objetivos
+target_items <- colnames(item_emb) %in% objetivo2_resultado$cod_est
+filtered_items <- colnames(item_emb)[target_items]
+
+# Inicializamos resultado
+resultados <- data.frame(
+  item_origen = character(),
+  item_mas_parecido = character(),
+  similitud = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Recorremos cada ítem objetivo
+for (item in filtered_items) {
+  origen_vec <- item_emb_norm[, item]
+  
+  # Calculamos similitud coseno con todos los demás ítems
+  sim <- apply(item_emb_norm, 2, function(x) sum(x * origen_vec))
+  
+  # Evitamos que se compare consigo mismo
+  sim[item] <- NA
+  
+  # Obtenemos el ítem más parecido
+  mejor_item <- names(which.max(sim))
+  mejor_score <- max(sim, na.rm = TRUE)
+  
+  # Añadimos al resultado
+  resultados <- rbind(resultados, data.frame(
+    item_origen = item,
+    item_mas_parecido = mejor_item,
+    similitud = mejor_score,
+    stringsAsFactors = FALSE
+  ))
+}
+
+# Mostramos el resultado
+print(resultados)
+
+# ahora miramos si este cliente ha comprado estos productos -->
+# añadimos a resultados el cliente:
+colnames(objetivo2_resultado) <- c("cliente", "item_origen", "descripcion") 
+df2 <- left_join(resultados,objetivo2_resultado, by = c("item_origen"))
+matriz_general %>% filter(cliente)
+
+
+# ----------------------------------- OBJETIVO 3: 
 # las matrices de usuario e item son iguales que para el objetivo 2
 # recomendarle de 20 productos uno de ellos al usuario
 user_emb <- user_emb[!rownames(user_emb) == "7776d22e65bc7a561b34457b4effb747",]
