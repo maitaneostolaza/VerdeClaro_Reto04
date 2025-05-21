@@ -111,7 +111,8 @@ saveRDS(eval,"Datos\\Resultados\\Comparando_algoritmos_topNlist_eval.rds")
 plot(eval) # a priori no hay mucha diferencia entre los algoritmos
   
 # ---- SACAMOS PARAMETROS PARA COMPRAR ALGORITMOS: 
-
+# cargamos el eval
+eval <- readRDS("Datos\\Resultados\\Comparando_algoritmos_topNlist_eval.rds")
 CM_Random <- getConfusionMatrix(eval[["random"]])[[1]]
 CM_UBCF_10 <- getConfusionMatrix(eval[["UBCF_10nn"]])[[1]]
 CM_UBCF_50 <- getConfusionMatrix(eval[["UBCF_5"]])[[1]]
@@ -126,7 +127,8 @@ eval_ratings <- evaluate(eval_scheme, algos, type = "ratings", n = c(1,3,5,10,15
 saveRDS(eval_ratings,"Datos\\Resultados\\Comparando_algoritmos_ratings_eval.rds")
 
 # --------------- SACAMOS PARAMETROS PARA COMPARAR ALGORITMOS: 
-
+# cargamos datos
+eval_ratings <- readRDS("Datos\\Resultados\\Comparando_algoritmos_ratings_eval.rds")
 random_ratings <- avg(eval_ratings[["random"]])
 UBCF_10nn_ratings <- avg(eval_ratings[["UBCF_10nn"]])
 UBCF_5nn_ratings <- avg(eval_ratings[["UBCF_5"]])
@@ -173,9 +175,8 @@ plot_ly(df, x = ~algoritmo, y = ~valor,
 # --------------------------------- RATINGS
 # Crear el data frame con las métricas
 comparativa_errores <- data.frame(
-  Modelo = c("POPULAR", "RANDOM", "UBCF_5n","UBCF_10n", "IBCF", "SVDF_10","SVDF_40", "ALS"),
+  Modelo = c("POPULAR",  "UBCF_5n","UBCF_10n", "IBCF", "SVDF_10","SVDF_40", "ALS"),
   RMSE = c(popular_ratings[1],
-           random_ratings[1],
            UBCF_5nn_ratings[1],
            UBCF_10nn_ratings[1],
            IBCF_ratings[1],
@@ -183,7 +184,6 @@ comparativa_errores <- data.frame(
            SVDF_ratings_40[1],
            ALS_ratings[1]),
   MAE = c(popular_ratings[3],
-          random_ratings[3],
           UBCF_5nn_ratings[3],
           UBCF_10nn_ratings[3],
           IBCF_ratings[3],
@@ -191,7 +191,6 @@ comparativa_errores <- data.frame(
           SVDF_ratings_40[3],
           ALS_ratings[3]),
   MSE = c(popular_ratings[2],
-          random_ratings[2],
           UBCF_5nn_ratings[2],
           UBCF_10nn_ratings[2],
           IBCF_ratings[2],
@@ -260,8 +259,4 @@ ggplot(df_long, aes(x = Modelo, y = Valor, fill = Metrica)) +
                                "FPR" = "#A2CBE8",
                                "coverage" = "#FADED6")) +
   theme(legend.position = "top")
-
-
-
-
 
