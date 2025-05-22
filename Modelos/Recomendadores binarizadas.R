@@ -3,6 +3,9 @@ library(rsparse)
 library(dplyr)
 library(tidyr)
 library(tibble)
+library(recommenderlab)
+library(dplyr)
+library(reshape2)
 
 tickets <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
 objetivos <- readRDS("Datos\\Originales\\objetivos.RDS")
@@ -11,8 +14,9 @@ productos <- readRDS("Datos\\Originales\\maestroestr.RDS")
 
 # ------------------ BINARIZAMOS LA MATRIZ
 storage.mode(matriz_general) <- "numeric"
-matriz <- ifelse(matriz_general > 0,1,0)
-matriz_general <- as(matriz,"sparseMatrix")
+matriz_general <- as(matriz_general, "realRatingMatrix")
+matriz_binarizada <- binarize(matriz_general, minRating = 1)
+matriz_general <- as(matriz_binarizada,"sparseMatrix")
 
 # para el objetivo 1 cambiamos filas por columnas
 matriz_alreves <- t(matriz_general)
@@ -21,8 +25,11 @@ matriz_alreves <- t(matriz_general)
 saveRDS(matriz_general, "Datos\\Resultados\\matriz_general.rds")
 saveRDS(matriz_alreves, "Datos\\Resultados\\matriz_alreves.rds")
 
+matriz_general <- readRDS("Datos\\Resultados\\matriz_general.rds")
+matriz_alreves <- readRDS("Datos\\Resultados\\matriz_alreves.rds")
 
 # -- MODELO: 
+set.seed(12)
 modelo_wrmf_alreves <- WRMF$new(rank = 10L, lambda = 0.1, feedback = 'implicit')
 modelo_wrmf_alreves$fit_transform(matriz_alreves, n_iter = 1000L, convergence_tol=0.000001)
 
@@ -147,12 +154,6 @@ item_emb_obj1 <- modelo_wrmf_alreves$fit_transform(matriz_alreves)
 user_emb_obj1 <- modelo_wrmf_alreves$components
 item_emb_obj1_n <- t(item_emb_obj1)
 
-comp1 <- item_emb_obj1[rownames(item_emb_obj1) == "14351005"]%*%user_emb_obj1 %>% 
-  sort(decreasing=TRUE, index.return = T)
-comp1_df <- data.frame(valoracion = comp1$x, usuario = colnames(user_emb_obj1)[comp1$ix])
-comp1_df[1:10,]
-objetivo1_resultado
-
 # ------------- vamos a ver si los clientes han comprado otros productos parecidos a la masa de pizza
 # calcular productos similares a la masa de pizza
 items_parecidos_masa_pizza <- item_emb_obj1[rownames(item_emb_obj1) == "14351005"]%*%item_emb_obj1_n %>% 
@@ -161,17 +162,20 @@ productos_masa_pizza_parecido <- colnames(item_emb_obj1_n)[items_parecidos_masa_
 productos_masa_pizza_parecido <- c(productos_masa_pizza_parecido,"08100110")
 productos_masa_pizza_parecido <- productos %>% filter(cod_est%in%productos_masa_pizza_parecido)
 productos_definitivos <- productos_masa_pizza_parecido %>% 
-  filter(descripcion %in% c("CHAMPIÑONES","LONCHAS PORCION INTERNACIONAL", "JAMON DE CERDO",
-                            "MEXICANA MASAS", "ROLLO COCINA LARGO",
+  filter(descripcion %in% c("CHAMPIÑONES","LONCHAS PORCION INTERNACIONAL",
+                            "LONCHAS PORCION NACIONAL","QUESO RALLADO MOZZARELLA",
+                            "MEXICANA MASAS", "PECHUGA DE PAVO",
                             "TOMATE TRITURADO HASTA 500G"))
 
 # ver si a los clientes que se le ha recomendado la masa de pizza efectivamente
 # han comprado los productos que mas se parecen
 COMPROBACION_DEFINITIVA_OBJ1 <- as.matrix(matriz_general[rownames(matriz_general) %in% objetivo1_resultado, colnames(matriz_general) %in% productos_definitivos$cod_est])
 COMPROBACION_DEFINITIVA_OBJ1 <- as.data.frame(COMPROBACION_DEFINITIVA_OBJ1)
-colnames(COMPROBACION_DEFINITIVA_OBJ1) <- c("JAMON DE CERDO", "LONCHAS PORCION INTERNACIONAL",
-                                            "MEXICANA MASAS", "ROLLO COCINA LARGO",
-                                            "CHAMPIÑONES","TOMATE TRITURADO HASTA 500G")
+colnames(COMPROBACION_DEFINITIVA_OBJ1) <- c( "LONCHAS PORCION INTERNACIONAL",	
+                                            "MEXICANA MASAS", "QUESO RALLADO MOZZARELLA",
+                                            "TOMATE TRITURADO HASTA 500G", 
+                                            "CHAMPIÑONES")
+COMPROBACION_DEFINITIVA_OBJ1 <- ifelse(COMPROBACION_DEFINITIVA_OBJ1 == T, 1, 0)
 
 # guardamos rds: 
 saveRDS(COMPROBACION_DEFINITIVA_OBJ1,"Datos\\Resultados\\comprobacion_objetivo1.rds")
@@ -188,32 +192,7 @@ item_emb_n <- t(modelo_wrmf$components)
 comprobacion2 <- user_emb[rownames(user_emb) %in% objetivos$objetivo2$obj,] %*% item_emb[] 
 
 
-verificar_predicciones <- function(matriz, users, items, prediccion, rerecomend) {
-  justificacion <- users %*% items
-  comprobaciones <- c()
-  items_max_list <- c()
-  
-  for (i in rownames(matriz)) {
-    usuarios <- justificacion[i, , drop = FALSE]
-    
-    if (!rerecomend) {
-      productos_comprados <- colnames(matriz)[as.logical(matriz[i, ])]
-      usuarios <- usuarios[, colnames(usuarios) %in% productos_comprados, drop = FALSE]
-    }
-    
-    items_max <- colnames(usuarios)[max.col(usuarios)]
-    prediccion_usuario <- prediccion[prediccion$Id_cliente == i, "cod_est", drop = TRUE]
-    
-    comprobaciones <- c(comprobaciones, prediccion_usuario == items_max)
-    items_max_list <- c(items_max_list, items_max)
-  }
-  
-  return(list(comprobaciones = comprobaciones, items_max = items_max_list))
-}
 
-
-matriz_obj2 <- as.matrix(matriz_obj2)
-verificar_predicciones(matriz_obj2,user_emb,item_emb, objetivo2_resultado, rerecomend = F)
 
 # mirar que items se parecen a los que ha predecido el usuario (cogemos los 15 productos mas similares)
 colnames(objetivo2_resultado) <- c("cliente", "item_origen", "descripcion")
@@ -246,7 +225,7 @@ for (item in filtered_items) {
   sim[item] <- NA
   
   # Obtenemos el ítem más parecido
-  mejor_item <- names(sort(sim, decreasing = T))[1:15]
+  mejor_item <- names(sort(sim, decreasing = T))[1:20]
   
   # Añadimos al resultado
   resultados <- rbind(resultados, data.frame(
@@ -274,6 +253,20 @@ lista_compras <- apply(comprobacion_items, 1, function(x) {
 names(lista_compras) <- rownames(comprobacion_items)
 print(lista_compras)
 
+# lo convertimos a data frame: 
+
+# Convertimos la lista en formato largo
+df_largo <- stack(lista_compras)
+colnames(df_largo) <- c("producto", "usuario")
+
+# Formato ancho con 1 y 0
+df_binario <- dcast(df_largo, usuario ~ producto, fun.aggregate = length, fill = 0)
+
+# Resultado
+print(df_binario)
+
+saveRDS(df_binario, "Datos\\Resultados\\comprobacion_obj2.rds")
+
 
 # ----------------------------------- OBJETIVO 3: 
 # las matrices de usuario e item son iguales que para el objetivo 2
@@ -287,10 +280,32 @@ comprobacion_obj3 <- data.frame(
   producto_recomendado = top_items_per_user
 )
 
-comprobacion_obj3 == objetivo3_resultado2[,1:2]
+# elegimos 10 clientes para comprobar si anteriormente han comprado ese producto
+# que les ha recomendado el algoritmo
+similarity <- t(item_emb[]) %*% item_emb[, colnames(item_emb) == "05030101", drop = F]
 
+# Asegúrate de que las filas de item_emb tienen nombres de ítems
+item_names <- colnames(item_emb)  # o colnames(item_emb) si la orientación es distinta
 
-funcion_comprobacion(matriz_obj3,user_emb, item_emb, objetivo3_resultado,rerecomend = F)
+# Convertimos la matriz de similitud a vector y le asignamos nombres
+similaridades <- as.vector(similarity)
+names(similaridades) <- item_names
+
+# Ordenamos las similitudes de mayor a menor
+similares_ordenados <- sort(similaridades, decreasing = TRUE)
+
+# Mostrar los 10 ítems más similares
+productos_similares_obj3 <- head(similares_ordenados, 10)
+
+# mirar si el cliente ha comprado alguno de estos productos: 
+clientes_comprar_obj3_producto_analizar <- rownames(objetivo3_resultado %>% filter(cod_est == "05030101"))
+comprobacion_obj3 <- as.matrix(matriz_general[rownames(matriz_general) %in% clientes_comprar_obj3_producto_analizar, colnames(matriz_general) %in% c("05030101",
+            "05040180", "12650101", "05040181", "09090503", "09070103", "12410315", "10080301", "10200101", "12670111")])
+
+comprobacion_obj31 <- ifelse(comprobacion_obj3 == T, 1, 0)
+comprobacion_obj32 <- comprobacion_obj31[rowSums(comprobacion_obj31) >= 7, ]
+
+saveRDS(comprobacion_obj32, "Datos\\Resultados\\Comprobacion_objetivo3.rds")
 
 # ---------------------------------- OBJETIVO 4: 
 biderketa4 <- user_emb[rownames(user_emb) %in% objetivos$objetivo4$obj,] %*% item_emb[] 
@@ -305,4 +320,33 @@ mejor_item_por_usuario <- apply(biderketa4, 1, function(fila) {
 # Resultado: named vector, donde nombre = usuario, valor = ítem más valorado
 as.data.frame(mejor_item_por_usuario)
 
+# mirar items de ultima compra --> calcular similaridad
+# mirar si los items recomendados los han comprado anteriormente alguna vez
+cliente1 <- as.data.frame(ultimas_compras[1])
+comprobacion_cliente1_obj4 <- inner_join(cliente1, productos, by = c("fe234baf66f020e01feb5253dfb398f0.cod_est" ="cod_est"))
+comprobacion_cliente1_obj4 <- comprobacion_cliente1_obj4 %>% mutate(asociacion = c(1,1,1,1,1,1,1,1,0,1,1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1,0,0,1,0,1,1))
+comprobacion_cliente1_obj4 <- comprobacion_cliente1_obj4[,-2]
+colnames(comprobacion_cliente1_obj4) <- c("PLATANO DE CANARIAS_cliente 1","descripcion", "asociacion")
 
+cliente2 <- as.data.frame(ultimas_compras[2])
+comprobacion_cliente2_obj4 <- inner_join(cliente2, productos, by = c("d85ceefcf666f2b27e3e1e1252e5a1ac.cod_est" ="cod_est"))
+comprobacion_cliente2_obj4 <- comprobacion_cliente2_obj4 %>% mutate(asociacion = c(1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1))
+comprobacion_cliente2_obj4 <- comprobacion_cliente2_obj4[,-2]
+colnames(comprobacion_cliente2_obj4) <- c("BROCOLI_cliente 2","descripcion", "asociacion")
+
+cliente3 <- as.data.frame(ultimas_compras[3])
+comprobacion_cliente3_obj4 <- inner_join(cliente3, productos, by = c("a8a16b0b76cb14783348e920a59588ed.cod_est" ="cod_est"))
+comprobacion_cliente3_obj4 %>% mutate(asociacion = c(1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1))
+colnames(comprobacion_cliente3_obj4) <- c("LECHE_SEMIDESNATADA_cliente 3","descripcion", "asociacion")
+dim(comprobacion_cliente1_obj4)
+dim(comprobacion_cliente2_obj4)
+dim(comprobacion_cliente3_obj4)
+
+comprobacion_objetivo4 <- list(comprobacion_cliente1_obj4,
+     comprobacion_cliente2_obj4,
+     comprobacion_cliente3_obj4)
+names(comprobacion_objetivo4) <- c("fe234baf66f020e01feb5253dfb398f0",
+                                   "d85ceefcf666f2b27e3e1e1252e5a1ac",
+                                   "a8a16b0b76cb14783348e920a59588ed")
+
+saveRDS(comprobacion_objetivo4,"Datos\\Resultados\\Comprobacion_objetivo4.rds")
