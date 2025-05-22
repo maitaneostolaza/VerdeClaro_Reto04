@@ -139,38 +139,6 @@ SVDF_ratings_40 <- avg(eval_ratings[["svdf_40"]])
 ALS_ratings <- avg(eval_ratings[["ALS"]]) 
 
 
-################### GRAFICOS PARA LA COMPARACION DE ALGORITMOS:
-library(plotly)
-library(dplyr)
-df <- data.frame("random" = random_ratings,
-                 "scdf" = svdf_ratings)
-
-df <- rbind(random_ratings,svdf_ratings)
-rownames(df) <- c("random","svdf")
-
-algoritmos <- c("random", "svdf")
-rmse <- c(25.956922, 2.700269)
-mse <- c(673.761809, 7.291451)
-mae <- c(22.165161, 1.765982)
-
-# Preparar dataframe para plotly
-df <- data.frame(
-  algoritmo = rep(algoritmos, times = 3),
-  metrica = rep(c("RMSE", "MSE", "MAE"), each = 2),
-  valor = c(rmse, mse, mae)
-)
-
-plot_ly(df, x = ~algoritmo, y = ~valor, 
-        color = ~metrica, colors = c("#E10A23","#005B92","#FFD5D1"),
-        type = 'bar', barmode = 'group') %>%
-  layout(
-    title = "Comparación de métricas de error por algoritmo",
-    xaxis = list(title = "Algoritmo"),
-    yaxis = list(title = "Valor"),
-    legend = list(title = list(text = 'Algoritmo'))
-  )
-
-
 ################################# GRAFICAMOS ###################################
 # --------------------------------- RATINGS
 
@@ -299,20 +267,6 @@ df_long <- pivot_longer(df_conf,
                         names_to = "Metrica",
                         values_to = "Valor")
 
-ggplot(df_long, aes(x = Modelo, y = Valor, fill = Metrica)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
-  coord_flip() +
-  labs(title = "Comparación de métricas para topNList (n=5)",
-       x = "Modelo",
-       y = "Valor Métrica",
-       fill = "Métrica") +
-  theme_minimal(base_size = 14) +
-  scale_fill_manual(values = c("precision" = "#B00A1C",
-                               "recall" = "#005B92",
-                               "TPR" = "#FFD5D1",
-                               "FPR" = "#A2CBE8",
-                               "coverage" = "#FADED6")) +
-  theme(legend.position = "top")
 
 df_roc <- df_long %>%
   filter(Metrica %in% c("TPR", "FPR")) %>%
