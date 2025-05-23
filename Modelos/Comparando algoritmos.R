@@ -292,3 +292,4 @@ ggplot(df_roc_wide, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
        color = "Modelo") +
   theme_minimal(base_size = 14) +
   theme(legend.position = "top")
+

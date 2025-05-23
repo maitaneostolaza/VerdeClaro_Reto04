@@ -191,81 +191,53 @@ item_emb_n <- t(modelo_wrmf$components)
 
 comprobacion2 <- user_emb[rownames(user_emb) %in% objetivos$objetivo2$obj,] %*% item_emb[] 
 
+# VAMOS A MIRAR LOS CLIENTES QUE MAS SE PARECEN A CADA USUARIO Y VER SI HAN COMPRADO
+# EL PRODUCTO QUE SE LE HA RECOMENDADO A ESTOS 10 CLIENTES
+# USUARIOS PARECIDOS: 
+biderketa2 <- user_emb[] %*% user_emb[rownames(user_emb) %in% objetivos$objetivo2$obj,] 
 
-
-
-# mirar que items se parecen a los que ha predecido el usuario (cogemos los 15 productos mas similares)
-colnames(objetivo2_resultado) <- c("cliente", "item_origen", "descripcion")
-# Función de normalización
-normalize <- function(x) x / sqrt(sum(x^2))
-
-# Normalizamos todas las columnas de item_emb
-item_emb_norm <- apply(item_emb, 2, normalize)
-
-# Ítems objetivos
-target_items <- colnames(item_emb) %in% objetivo2_resultado$item_origen
-filtered_items <- colnames(item_emb)[target_items]
-
-# Inicializamos resultado
-resultados <- data.frame(
-  item_origen = character(),
-  item_mas_parecido = character(),
-  similitud = numeric(),
-  stringsAsFactors = FALSE
-)
-
-# Recorremos cada ítem objetivo
-for (item in filtered_items) {
-  origen_vec <- item_emb_norm[, item]
+# creamos funcion para encontrar el usuario mas parecido por cada usuario del objetivo 2: 
+# Vector con usuarios objetivo
+usuarios_mas_parecidos <- function(user_emb, objetivos, top_n = 3) {
+  usuarios_objetivo <- objetivos$objetivo2$obj
   
-  # Calculamos similitud coseno con todos los demás ítems
-  sim <- apply(item_emb_norm, 2, function(x) sum(x * origen_vec))
-  
-  # Evitamos que se compare consigo mismo
-  sim[item] <- NA
-  
-  # Obtenemos el ítem más parecido
-  mejor_item <- names(sort(sim, decreasing = T))[1:20]
-  
-  # Añadimos al resultado
-  resultados <- rbind(resultados, data.frame(
-    item_origen = item,
-    item_mas_parecido = mejor_item,
+  resultados <- data.frame(
+    usuario_objetivo = character(),
+    usuario_parecido = character(),
+    similitud = numeric(),
     stringsAsFactors = FALSE
-  ))
+  )
+  
+  for (usuario in usuarios_objetivo) {
+    if (!(usuario %in% rownames(user_emb))) {
+      warning(paste("Usuario no encontrado:", usuario))
+      next
+    }
+    
+    emb_obj <- user_emb[usuario, , drop = FALSE]
+    similitudes <- user_emb %*% t(emb_obj)
+    similitudes_vec <- as.vector(similitudes)
+    names(similitudes_vec) <- rownames(user_emb)
+    
+    # Excluir el mismo usuario
+    similitudes_vec[usuario] <- -Inf
+    
+    # Obtener los top N más parecidos
+    top_idx <- order(similitudes_vec, decreasing = TRUE)[1:top_n]
+    
+    resultados <- rbind(resultados, data.frame(
+      usuario_objetivo = rep(usuario, top_n),
+      usuario_parecido = names(similitudes_vec)[top_idx],
+      similitud = similitudes_vec[top_idx],
+      stringsAsFactors = FALSE
+    ))
+  }
+  
+  return(resultados)
 }
 
-# Mostramos el resultado
+resultados <- usuarios_mas_parecidos(user_emb,objetivos, top_n = 5)
 print(resultados)
-
-# ahora miramos si este cliente ha comprado estos productos -->
-# añadimos a resultados el cliente:
- 
-df2 <- left_join(resultados,objetivo2_resultado, by = c("item_origen"))
-comprobacion_items <- as.matrix(matriz_general[rownames(matriz_general) %in% unique(df2$cliente), colnames(matriz_general) %in% df2$item_mas_parecido])
-
-# Creamos una lista donde cada elemento es un cliente con los productos comprados
-lista_compras <- apply(comprobacion_items, 1, function(x) {
-  names(x)[x == 1]
-})
-
-# Convertimos en lista nombrada (por si pierde nombres)
-names(lista_compras) <- rownames(comprobacion_items)
-print(lista_compras)
-
-# lo convertimos a data frame: 
-
-# Convertimos la lista en formato largo
-df_largo <- stack(lista_compras)
-colnames(df_largo) <- c("producto", "usuario")
-
-# Formato ancho con 1 y 0
-df_binario <- dcast(df_largo, usuario ~ producto, fun.aggregate = length, fill = 0)
-
-# Resultado
-print(df_binario)
-
-saveRDS(df_binario, "Datos\\Resultados\\comprobacion_obj2.rds")
 
 
 # ----------------------------------- OBJETIVO 3: 
