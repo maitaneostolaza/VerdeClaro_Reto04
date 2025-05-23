@@ -7,15 +7,23 @@ library(cowplot)
 library(purrr)
 library(DT)
 library(lubridate)
+library(recommenderlab)
 library(scales)
 
 options(scipen = 999)
 
 # ---------------- CARGA DE DATOS ---------------- #
+eval <- readRDS("Datos/Resultados/Comparando_algoritmos_topNlist_eval.rds")
+eval_ratings <- readRDS("Datos/Resultados/Comparando_algoritmos_ratings_eval.rds")
 df_entero <- readRDS("Datos/Transformados/df_con_clusteres.rds")
 tickets <- readRDS("Datos/Transformados/tickets_limpios.rds")
 productos <- readRDS("Datos/Originales/maestroestr.RDS")
 tickets_enc <- readRDS("Datos\\Originales\\tickets_enc.RDS")
+matriz <- readRDS("Datos/Resultados/Matriz_red_comp_algos.rds")
+matriz_rec <- as(matriz, "realRatingMatrix")
+
+
+
 eroski_palette_extended <- c(
   "#E10A23", "#B00A1C", "#F0928E", "#FFD5D1",
   "#0074B5", "#005B92", "#A2CBE8", "#FADED6"
@@ -25,7 +33,9 @@ datos <- tickets_enc
 colnames(datos) <- c("fecha", "ticket", "cod_est", "id_cliente")
 datos$fecha <- ymd(datos$fecha)
 
+
 datos_enriquecidos <- left_join(datos, productos, by = "cod_est")
+
 
 # Unimos clusters al df de tickets
 df <- left_join(tickets, df_entero, by = "id_cliente_enc")
@@ -183,20 +193,20 @@ top20prods_total_por_cluster <- ggplot(top20_cluster, aes(x = cantidad_producto,
 # --- UI ---
 ui <- fluidPage(
   titlePanel("App con Pestañas y Desplegables"),
+  
   tabsetPanel(
+    
     tabPanel("Objetivos",
              sidebarLayout(
                sidebarPanel(
                  selectInput("objetivo_select", "Selecciona un objetivo:", choices = c("Objetivo 1", "Objetivo 2", "Objetivo 3", "Objetivo 4")),
                  
-                 # Inputs condicionales por objetivo
                  conditionalPanel(condition = "input.objetivo_select == 'Objetivo 1'",
                                   selectInput("grafico1_select", "Selecciona un gráfico:", choices = c("Gráfico A1", "Gráfico A2", "Gráfico B1", "Gráfico B2"))
                  ),
                  conditionalPanel(condition = "input.objetivo_select == 'Objetivo 2'",
                                   selectInput("grafico2_select", "Selecciona un gráfico:", choices = c("Gráfico 2A", "Grafico 2B"))
                  ),
-                 
                  conditionalPanel(condition = "input.objetivo_select == 'Objetivo 3'",
                                   selectInput("grafico3_select", "Selecciona un gráfico:", choices = c("Gráfico 3A", "Gráfico 3B"))
                  ),
@@ -210,7 +220,8 @@ ui <- fluidPage(
                  conditionalPanel(condition = "input.objetivo_select == 'Objetivo 3'", plotOutput("plot_obj3")),
                  conditionalPanel(condition = "input.objetivo_select == 'Objetivo 4'", plotOutput("plot_obj4"))
                )
-             )),
+             )
+    ),
     
     tabPanel("Análisis Exploratorio",
              sidebarLayout(
@@ -229,48 +240,82 @@ ui <- fluidPage(
                mainPanel(
                  plotOutput("grafico_dinamico", height = "600px")
                )
-             )),
+             )
+    ),
     
-    tabPanel("Clusters",
+    tabPanel("Caracterización",
+             tabsetPanel(
+               
+               tabPanel("Clusters",
+                        sidebarLayout(
+                          sidebarPanel(
+                            selectInput("cluster_plot_select", "Selecciona gráfico a visualizar:", choices = c(
+                              "Resumen de medias" = "medias",
+                              "Productos más comprados" = "prod_mas",
+                              "Productos menos comprados" = "prod_menos",
+                              "Productos generales más comprados" = "prod_gen_mas",
+                              "Productos generales menos comprados" = "prod_gen_menos",
+                              "Top 20 por cluster" = "top20"
+                            ))
+                          ),
+                          mainPanel(
+                            plotOutput("plot_clusters_dinamico", height = "600px")
+                          )
+                        )
+               ),
+               
+               tabPanel("Modelos Para clusters",
+                        sidebarLayout(
+                          sidebarPanel(
+                            selectInput("grafico_modelo_select", "Selecciona un gráfico:", choices = c(
+                              "Método del codo" = "codo",
+                              "Distribución por cluster" = "distribucion"
+                            ))
+                          ),
+                          mainPanel(
+                            plotlyOutput("grafico_modelos")
+                          )
+                        )
+               ),
+               
+               tabPanel("Centroides",
+                        sidebarLayout(
+                          sidebarPanel(
+                            selectInput("cluster", "Selecciona un cluster", choices = NULL)
+                          ),
+                          mainPanel(
+                            DTOutput("tabla_centroides_clusteres")
+                          )
+                        )
+               ),
+               
+               tabPanel("Centroides 3D",
+                        fluidRow(
+                          column(12,
+                                 plotlyOutput("grafico_centroides_3d", height = "600px")
+                          )
+                        )
+               )
+               
+             )
+    ),
+    
+    tabPanel("Gráficos para modelos",
              sidebarLayout(
                sidebarPanel(
-                 selectInput("cluster_plot_select", "Selecciona gráfico a visualizar:", choices = c(
-                   "Resumen de medias" = "medias",
-                   "Productos más comprados" = "prod_mas",
-                   "Productos menos comprados" = "prod_menos",
-                   "Productos generales más comprados" = "prod_gen_mas",
-                   "Productos generales menos comprados" = "prod_gen_menos",
-                   "Top 20 por cluster" = "top20"
+                 selectInput("grafico_modelo_comparacion", "Selecciona un gráfico:", choices = c(
+                   "Errores (con random)" = "errores_con_random",
+                   "Errores (sin random)" = "errores_sin_random",
+                   "TPR VS FPR" = "roc_curve"
                  ))
                ),
                mainPanel(
-                 plotOutput("plot_clusters_dinamico", height = "600px")
+                 plotOutput("grafico_modelos_comparativos", height = "600px")
                )
-             )),
-    tabPanel("Centroides",
-             sidebarLayout(
-               sidebarPanel(
-                 selectInput("cluster", "Selecciona un cluster", choices = NULL)
-               ),
-               mainPanel(
-                 DTOutput("tabla_centroides_clusteres")
-               )
-             )),
+             )
+    )
     
-    tabPanel("Gráficos para Modelos",
-             sidebarLayout(
-               sidebarPanel(
-                 selectInput("grafico_modelo_select", "Selecciona un gráfico:", choices = c(
-                   "Método del codo" = "codo",
-                   "Distribución por cluster" = "distribucion",
-                   "Centroides en 3D" = "centroides"
-                 ))
-               ),
-               mainPanel(
-                 plotlyOutput("grafico_modelos")
-               )
-             ))
-  )
+  )  
 )
 
 server <- function(input, output, session) {
@@ -489,6 +534,10 @@ server <- function(input, output, session) {
     )
   })
   
+  output$grafico_centroides_3d <- renderPlotly({
+    plot_centroides_kmeans
+  })
+  
   # Centroides
   updateSelectInput(session, "cluster",
                     choices = c("Todos", levels(media_clusteres$cluster)),
@@ -508,9 +557,71 @@ server <- function(input, output, session) {
     req(input$grafico_modelo_select) # Asegura que haya un valor seleccionado
     switch(input$grafico_modelo_select,
            "codo" = metodo_codo,
-           "distribucion" = grafico_distribucion_centroides,
-           "centroides" = plot_centroides_kmeans
+           "distribucion" = grafico_distribucion_centroides
     )
+  })
+  
+  CMs <- lapply(eval, function(x) getConfusionMatrix(x)[[1]])
+  ratings <- lapply(eval_ratings, avg)
+  
+  # DataFrame errores (con y sin random)
+  modelos_con_random <- c("POPULAR", "UBCF_5n", "UBCF_10n", "RANDOM", "IBCF", "SVDF_10", "SVDF_40", "ALS")
+  modelos_sin_random <- setdiff(modelos_con_random, "RANDOM")
+  
+  get_df_errores <- function(modelos) {
+    data.frame(
+      Modelo = modelos,
+      RMSE = sapply(modelos, function(m) ratings[[tolower(m)]][1]),
+      MAE  = sapply(modelos, function(m) ratings[[tolower(m)]][3]),
+      MSE  = sapply(modelos, function(m) ratings[[tolower(m)]][2])
+    )
+  }
+  
+  df_conf_long <- pivot_longer(df_conf, cols = -Modelo, names_to = "Metrica", values_to = "Valor")
+  
+  # ROC
+  df_roc <- df_conf_long %>%
+    filter(Metrica %in% c("TPR", "FPR")) %>%
+    mutate(Metrica = tolower(Metrica)) %>%
+    group_by(Modelo, Metrica) %>%
+    mutate(Paso = row_number()) %>%
+    ungroup() %>%
+    pivot_wider(names_from = Metrica, values_from = Valor)
+  
+  # RenderPlot
+  output$grafico_modelos_comparativos <- renderPlot({
+    tipo <- input$grafico_modelo_comparacion
+    
+    if (tipo == "errores_con_random") {
+      df <- get_df_errores(modelos_con_random) %>%
+        pivot_longer(-Modelo, names_to = "Metrica", values_to = "Valor")
+      
+      ggplot(df, aes(x = Modelo, y = Valor, fill = Metrica)) +
+        geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+        labs(title = "Comparación de errores por modelo (con RANDOM)", y = "Valor del error", x = "Modelo") +
+        theme_minimal(base_size = 14) +
+        scale_fill_manual(values = c("RMSE" = "#B00A1C", "MAE" = "#005B92", "MSE" = "#FFD5D1")) +
+        theme(legend.position = "top")
+      
+    } else if (tipo == "errores_sin_random") {
+      df <- get_df_errores(modelos_sin_random) %>%
+        pivot_longer(-Modelo, names_to = "Metrica", values_to = "Valor")
+      
+      ggplot(df, aes(x = Modelo, y = Valor, fill = Metrica)) +
+        geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+        labs(title = "Comparación de errores por modelo (sin RANDOM)", y = "Valor del error", x = "Modelo") +
+        theme_minimal(base_size = 14) +
+        scale_fill_manual(values = c("RMSE" = "#B00A1C", "MAE" = "#005B92", "MSE" = "#FFD5D1")) +
+        theme(legend.position = "top")
+      
+    } else if (tipo == "roc_curve") {
+      ggplot(df_roc, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
+        geom_line(size = 1.2) +
+        geom_point(size = 2) +
+        labs(title = "Curva ROC: TPR vs FPR por Modelo", x = "FPR", y = "TPR") +
+        theme_minimal(base_size = 14) +
+        theme(legend.position = "top")
+    }
   })
   
   
