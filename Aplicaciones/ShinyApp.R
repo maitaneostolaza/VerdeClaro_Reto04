@@ -577,6 +577,18 @@ server <- function(input, output, session) {
     )
   }
   
+  conf_matrix_n5_list <- lapply(eval, function(res) getConfusionMatrix(res, n = 5))
+  
+  # Convertir matrices a dataframe largo
+  df_list <- lapply(names(conf_matrix_n5_list), function(modelo){
+    df <- as.data.frame(conf_matrix_n5_list[[modelo]])
+    df$Modelo <- modelo
+    df
+  })
+  
+  df_conf <- do.call(rbind, df_list)
+  
+  
   df_conf_long <- pivot_longer(df_conf, cols = -Modelo, names_to = "Metrica", values_to = "Valor")
   
   # ROC
