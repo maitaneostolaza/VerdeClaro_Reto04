@@ -192,7 +192,7 @@ top20prods_total_por_cluster <- ggplot(top20_cluster, aes(x = cantidad_producto,
   theme_minimal()
 # --- UI ---
 ui <- fluidPage(
-  titlePanel("App con Pestañas y Desplegables"),
+  titlePanel("Reto 04 Eroski"),
   
   tabsetPanel(
     
@@ -563,18 +563,25 @@ server <- function(input, output, session) {
   
   CMs <- lapply(eval, function(x) getConfusionMatrix(x)[[1]])
   ratings <- lapply(eval_ratings, avg)
+  names(ratings) <- tolower(names(ratings))
   
   # DataFrame errores (con y sin random)
-  modelos_con_random <- c("POPULAR", "UBCF_5n", "UBCF_10n", "RANDOM", "IBCF", "SVDF_10", "SVDF_40", "ALS")
-  modelos_sin_random <- setdiff(modelos_con_random, "RANDOM")
+  modelos_con_random    <- names(ratings)
+  modelos_sin_random    <- setdiff(modelos_con_random, "random")
   
   get_df_errores <- function(modelos) {
-    data.frame(
-      Modelo = modelos,
-      RMSE = sapply(modelos, function(m) ratings[[tolower(m)]][1]),
-      MAE  = sapply(modelos, function(m) ratings[[tolower(m)]][3]),
-      MSE  = sapply(modelos, function(m) ratings[[tolower(m)]][2])
-    )
+    map_dfr(modelos, ~{
+      rt <- ratings[[.x]]
+      if (is.null(rt) || length(rt) < 3) {
+        rt <- rep(NA_real_, 3)
+      }
+      tibble(
+        Modelo = toupper(.x),
+        RMSE   = rt[1],
+        MAE    = rt[3],
+        MSE    = rt[2]
+      )
+    })
   }
   
   conf_matrix_n5_list <- lapply(eval, function(res) getConfusionMatrix(res, n = 5))
