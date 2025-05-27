@@ -191,11 +191,17 @@ top20prods_total_por_cluster <- ggplot(top20_cluster, aes(x = cantidad_producto,
   labs(title = "Top 20 productos más vendidos y su distribución por cluster", x = "Cantidad total", y = "Producto") +
   scale_fill_manual(values = c("#E10A23", "#F0928E", "#0074B5", "#A2CBE8")) +
   theme_minimal()
+
 # --- UI ---
-max_unidades_vendidas <- df %>%
-  count(descripcion, sort = TRUE) %>%
-  summarise(maximo = max(n)) %>%
-  pull(maximo)
+resumen_unidades <- df %>%
+  count(descripcion) %>%
+  summarise(
+    minimo = min(n),
+    maximo = max(n)
+  )
+min_unidades_vendidas <- resumen_unidades$minimo
+max_unidades_vendidas <- resumen_unidades$maximo
+
 
 ui <- navbarPage(
   title = "Reto 4 Eroski",
@@ -212,7 +218,10 @@ ui <- navbarPage(
                selectInput("filtro_producto", "Producto general:",
                            choices = c("Todos", unique(df$producto_general))),
                sliderInput("filtro_min_compras", "Mínimo de unidades vendidas:",
-                           min = 1, max = max_unidades_vendidas, value = 1, step = 1),
+                           min = min_unidades_vendidas,
+                           max = max_unidades_vendidas,
+                           value = min_unidades_vendidas,
+                           step = 1),
                actionButton("ejecutar_filtros", "Aplicar filtros", icon = icon("play"), class = "btn-primary"),
                actionButton("reset_filtros", "Resetear filtros", icon = icon("redo"), class = "btn-danger")
                
@@ -259,12 +268,24 @@ ui <- navbarPage(
   
   # 3. Resultados de Modelos
   tabPanel("3 - Modelos",
-           tabsetPanel(
-             tabPanel("Errores con Random", plotOutput("grafico_errores_con_random")),
-             tabPanel("Errores sin Random", plotOutput("grafico_errores_sin_random")),
-             tabPanel("Curva ROC", plotOutput("grafico_roc"))
+           sidebarLayout(
+             sidebarPanel(
+               checkboxGroupInput("metricas_modelos", "Métricas a mostrar:",
+                                  choices = c("RMSE", "MAE", "MSE"),
+                                  selected = c("RMSE", "MAE", "MSE")),
+               helpText("Puedes seleccionar qué métricas comparar."),
+               selectInput("modelos_roc", "Modelos en curva ROC:",
+                           choices = NULL, multiple = TRUE)
+             ),
+             mainPanel(
+               tabsetPanel(
+                 tabPanel("Errores con Random", plotOutput("grafico_errores_con_random")),
+                 tabPanel("Errores sin Random", plotOutput("grafico_errores_sin_random")),
+                 tabPanel("Curva ROC", plotOutput("grafico_roc"))
+               )
+             )
            )
-  ),
+  ) ,
   
   # 4. Resultados Objetivos
   tabPanel("4 - Objetivos",
@@ -330,7 +351,8 @@ server <- function(input, output, session) {
                        end = max(df$fecha))
   updateSelectInput(session, "filtro_dia", selected = "Todos")
   updateSelectInput(session, "filtro_producto", selected = "Todos")
-
+  updateSliderInput(session, "filtro_min_compras", value = min_unidades_vendidas)
+  
   filtros$df <- df
 })
 
@@ -545,11 +567,17 @@ server <- function(input, output, session) {
     ungroup() %>%
     pivot_wider(names_from = Metrica, values_from = Valor)
   
+  observe({
+    updateSelectInput(session, "modelos_roc",
+                      choices = unique(df_roc$Modelo),
+                      selected = unique(df_roc$Modelo))
+  })
   
   # ---- PESTAÑA 3: Resultados de Modelos ----
   output$grafico_errores_con_random <- renderPlot({
     df <- get_df_errores(modelos_con_random) %>%
-      pivot_longer(-Modelo, names_to = "Metrica", values_to = "Valor")
+      pivot_longer(-Modelo, names_to = "Metrica", values_to = "Valor") %>%
+      filter(Metrica %in% input$metricas_modelos)
     
     ggplot(df, aes(x = Modelo, y = Valor, fill = Metrica)) +
       geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
@@ -561,7 +589,8 @@ server <- function(input, output, session) {
   
   output$grafico_errores_sin_random <- renderPlot({
     df <- get_df_errores(modelos_sin_random) %>%
-      pivot_longer(-Modelo, names_to = "Metrica", values_to = "Valor")
+      pivot_longer(-Modelo, names_to = "Metrica", values_to = "Valor") %>%
+      filter(Metrica %in% input$metricas_modelos)
     
     ggplot(df, aes(x = Modelo, y = Valor, fill = Metrica)) +
       geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
@@ -572,7 +601,9 @@ server <- function(input, output, session) {
   })
   
   output$grafico_roc <- renderPlot({
-    ggplot(df_roc, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
+    df_roc_filtrado <- df_roc %>% filter(Modelo %in% input$modelos_roc)
+    
+    ggplot(df_roc_filtrado, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
       geom_line(size = 1.2) +
       geom_point(size = 2) +
       labs(title = "Curva ROC: TPR vs FPR por Modelo", x = "FPR", y = "TPR") +
