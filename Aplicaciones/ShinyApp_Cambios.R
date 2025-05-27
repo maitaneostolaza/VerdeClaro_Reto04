@@ -22,8 +22,10 @@ productos <- readRDS("Datos/Originales/maestroestr.RDS")
 tickets_enc <- readRDS("Datos\\Originales\\tickets_enc.RDS")
 matriz <- readRDS("Datos/Resultados/Matriz_red_comp_algos.rds")
 matriz_rec <- as(matriz, "realRatingMatrix")
-
-
+objetivo1_data <- readRDS("Datos/Resultados/Objetivo1_resultado.rds")
+objetivo2_data <- readRDS("Datos/Resultados/Objetivo2_resultado.rds")
+objetivo3_data <- readRDS("Datos/Resultados/Objetivo3_resultado.rds")
+objetivo4_data <- readRDS("Datos/Resultados/Objetivo4_resultado.rds")
 
 eroski_palette_extended <- c(
   "#E10A23", "#B00A1C", "#F0928E", "#FFD5D1",
@@ -93,27 +95,26 @@ media_clusteres <- df_entero %>%
 media_unidades <- media_clusteres[, c(1, 2)]
 media_dias <- media_clusteres[, c(1, 3)]
 total_compra <- media_clusteres[, c(1, 4)]
-
 media_unidades_gf <- ggplot(media_unidades, aes(x = cluster, y = media_unidades_por_compra, fill = cluster)) +
   geom_col() +
   labs(title = "Media de unidades por compra", x = "Cluster", y = "Unidades medias") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c("1" = "steelblue", "2" = "grey", "3" = "green4", "4" = "#d62728"))
+  scale_fill_manual(values = c("#E10A23", "#F0928E", "#0074B5", "#A2CBE8"))
 
 media_diasgf <- ggplot(media_dias, aes(x = cluster, y = media_de_dias_pasadas_por_compras, fill = cluster)) +
   geom_col() +
   labs(title = "Media de días transcurridos por compra", x = "Cluster", y = "Media de días") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c("1" = "steelblue", "2" = "grey", "3" = "green4", "4" = "#d62728"))
+  scale_fill_manual(values = c("#E10A23", "#F0928E", "#0074B5", "#A2CBE8"))
 
 total_comprasgf <- ggplot(total_compra, aes(x = cluster, y = total_veces_que_ha_comprado, fill = cluster)) +
   geom_col() +
   labs(title = "Total veces que han comprado", x = "Cluster", y = "Total compras") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c("1" = "steelblue", "2" = "grey", "3" = "green4", "4" = "#d62728"))
+  scale_fill_manual(values = c("#E10A23", "#F0928E", "#0074B5", "#A2CBE8"))
 
 media_unidades_gf_nolegend <- media_unidades_gf + theme(legend.position = "none")
 media_diasgf_nolegend <- media_diasgf + theme(legend.position = "none")
@@ -296,7 +297,10 @@ ui <- navbarPage(
                uiOutput("opciones_objetivo")
              ),
              mainPanel(
-               uiOutput("grafico_objetivo")
+               conditionalPanel(condition = "input.objetivo_select == 'Objetivo 1'", plotOutput("plot_obj1")),
+               conditionalPanel(condition = "input.objetivo_select == 'Objetivo 2'", plotlyOutput("plot_obj2")),
+               conditionalPanel(condition = "input.objetivo_select == 'Objetivo 3'", plotOutput("plot_obj3")),
+               conditionalPanel(condition = "input.objetivo_select == 'Objetivo 4'", plotOutput("plot_obj4"))
              )
            )
   )
@@ -612,51 +616,51 @@ server <- function(input, output, session) {
   })
   # ---- PESTAÑA 4: Resultados Objetivos ----
   
-  output$opciones_objetivo <- renderUI({
-    switch(input$objetivo_select,
-           "Objetivo 1" = selectInput("grafico1_select", "Gráfico:", choices = c("A1", "A2", "B1", "B2")),
-           "Objetivo 2" = selectInput("grafico2_select", "Gráfico:", choices = c("2A", "2B")),
-           "Objetivo 3" = selectInput("grafico3_select", "Gráfico:", choices = c("3A", "3B")),
-           "Objetivo 4" = selectInput("grafico4_select", "Gráfico:", choices = c("4A", "4B"))
-    )
+  
+  # OBJETIVO 1: Top 10 clientes que compraron MASAS DE PIZZA
+  output$plot_obj1 <- renderPlot({
+    clientes <- as.vector(objetivo1_data[, 1])
+    df <- data.frame(id_cliente = clientes)
+    df <- df %>% count(id_cliente, name = "cantidad")
+    ggplot(df, aes(x = reorder(id_cliente, cantidad), y = cantidad)) +
+      geom_col(fill = eroski_palette_extended[1]) +
+      coord_flip() +
+      labs(title = "Clientes que compraron MASAS DE PIZZA", x = "ID Cliente", y = "Cantidad") +
+      theme_minimal()
   })
   
-  output$grafico_objetivo <- renderUI({
-    switch(input$objetivo_select,
-           "Objetivo 1" = plotOutput("plot_obj1"),
-           "Objetivo 2" = plotlyOutput("plot_obj2"),
-           "Objetivo 3" = plotOutput("plot_obj3"),
-           "Objetivo 4" = plotOutput("plot_obj4")
-    )
-  })
-  
-  grafico1_list <- list(
-    "A1" = ggplot(mtcars, aes(wt, mpg)) + geom_point() + ggtitle("Objetivo 1 - A1"),
-    "A2" = ggplot(mtcars, aes(wt, qsec)) + geom_point(color = "blue") + ggtitle("Objetivo 1 - A2"),
-    "B1" = ggplot(mtcars, aes(factor(cyl), mpg)) + geom_boxplot() + ggtitle("Objetivo 1 - B1"),
-    "B2" = ggplot(mtcars, aes(factor(cyl), hp)) + geom_boxplot(fill = "orange") + ggtitle("Objetivo 1 - B2")
-  )
-  output$plot_obj1 <- renderPlot({ grafico1_list[[input$grafico1_select]] })
-  
+  # OBJETIVO 2: Productos más comprados por los 10 clientes
   output$plot_obj2 <- renderPlotly({
-    if (input$grafico2_select == "2A") {
-      ggplotly(ggplot(mtcars, aes(mpg)) + geom_histogram(bins = 10, fill = "skyblue") + ggtitle("Objetivo 2 - A"))
-    } else {
-      ggplotly(ggplot(mtcars, aes(hp, mpg)) + geom_point(color = "red") + ggtitle("Objetivo 2 - B"))
-    }
+    df <- objetivo2_data %>% count(descripcion, name = "cantidad")
+    plot_ly(df, x = ~descripcion, y = ~cantidad, type = 'bar', color = ~descripcion, colors = eroski_palette_extended) %>%
+      layout(title = "Productos más comprados por los 10 clientes",
+             xaxis = list(title = "Producto"),
+             yaxis = list(title = "Cantidad"))
   })
   
-  grafico3_list <- list(
-    "3A" = ggplot(mtcars, aes(gear, mpg)) + geom_bar(stat = "identity") + ggtitle("Objetivo 3 - A"),
-    "3B" = ggplot(mtcars, aes(drat, mpg)) + geom_line() + ggtitle("Objetivo 3 - B")
-  )
-  output$plot_obj3 <- renderPlot({ grafico3_list[[input$grafico3_select]] })
+  # OBJETIVO 3: Productos más comprados (global)
+  output$plot_obj3 <- renderPlot({
+    df <- objetivo3_data %>%
+      count(descripcion, sort = TRUE) %>%
+      slice_max(n, n = 10)
+    
+    ggplot(df, aes(x = reorder(descripcion, n), y = n)) +
+      geom_col(fill = eroski_palette_extended[5]) +
+      coord_flip() +
+      labs(title = "Top 10 productos más comprados (global)", x = "Producto", y = "Cantidad") +
+      theme_minimal()
+  })
   
-  grafico4_list <- list(
-    "4A" = ggplot(mtcars, aes(disp, drat)) + geom_point(color = "purple") + ggtitle("Objetivo 4 - A"),
-    "4B" = ggplot(mtcars, aes(wt, qsec)) + geom_smooth() + ggtitle("Objetivo 4 - B")
-  )
-  output$plot_obj4 <- renderPlot({ grafico4_list[[input$grafico4_select]] })
+  # OBJETIVO 4: Recomendaciones por cliente (codificado)
+  output$plot_obj4 <- renderPlot({
+    df <- objetivo4_data %>% count(descripcion, name = "cantidad")
+    ggplot(df, aes(x = reorder(descripcion, cantidad), y = cantidad)) +
+      geom_col(fill = eroski_palette_extended[7]) +
+      coord_flip() +
+      labs(title = "Recomendaciones por cliente codificado", x = "Producto recomendado", y = "Frecuencia") +
+      theme_minimal()
+  })
+  
 }
 
 
