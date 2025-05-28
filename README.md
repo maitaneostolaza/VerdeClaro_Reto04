@@ -59,7 +59,6 @@ Una vez tengas abierta la **interfaz de la API en tu navegador**, verás una pan
 
 A continuación, te explicamos cómo funciona cada una:
 
----
 
 ### 🔹 **/recomendar_promocion**  
 📌 Devuelve el producto promocionado y los **10 clientes seleccionados** como receptores ideales.
@@ -68,7 +67,7 @@ A continuación, te explicamos cómo funciona cada una:
 2. Pulsa **“Try it out”** y después **“Execute”**.  
 3. Verás el **código y nombre del producto**, y la lista de **clientes recomendados**.
 
----
+
 
 ### 🔹 **/recomendar_otros_como_tu**  
 📌 Devuelve el producto que otros clientes similares han comprado, pero que el cliente indicado aún no ha adquirido.
@@ -78,7 +77,7 @@ A continuación, te explicamos cómo funciona cada una:
 3. Introduce un `cliente_id` del objetivo 2.  
 4. Pulsa **“Execute”** y consulta el resultado.
 
----
+
 
 ### 🔹 **/recomendar_oferta**  
 📌 Devuelve qué producto en oferta se le asigna a un cliente específico.
@@ -88,7 +87,7 @@ A continuación, te explicamos cómo funciona cada una:
 3. Introduce un `cliente_id` del objetivo 3.  
 4. Pulsa **“Execute”** para ver el **producto recomendado**.
 
----
+
 
 ### 🔹 **/recomendar_olvido**  
 📌 Identifica qué producto ha podido olvidar el cliente en su última compra.
