@@ -42,10 +42,10 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 ## 🌿 Ramas del repositorio
 Durante el desarrollo del proyecto se han utilizado diferentes ramas para organizar el trabajo por bloques funcionales:
 
-- ` main`: rama principal y estable del proyecto.  
-- ` Recomendadores`: desarrollo de los distintos sistemas de recomendación.  
-- ` Shinny`: implementación de la app interactiva en Shiny.  
-- ` Api`: construcción y pruebas de la API REST con Plumber.
+- `main`: rama principal y estable del proyecto.  
+- `Recomendadores`: desarrollo de los distintos sistemas de recomendación.  
+- `Shinny`: implementación de la app interactiva en Shiny.  
+- `Api`: construcción y pruebas de la API REST con Plumber.
 
 Una vez finalizado el proyecto, se procederá a hacer merge de las ramas.
 
