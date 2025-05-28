@@ -221,51 +221,45 @@ media_unidades <- media_clusteres[,c(1,2)]
 media_dias <- media_clusteres[,c(1,3)]
 total_compra <- media_clusteres[c(1,4)]
 
-# Crear gráfico de barras facetado
+# Paleta actualizada (usamos los primeros 4 colores)
+colores_clusters <- c("1" = "#E10A23",   # rojo intenso
+                      "2" = "#A2CBE8",   # rojo oscuro
+                      "3" = "#005B92",   # rosa claro
+                      "4" = "#F0928E")   # rosa pálido
+
+# Media de unidades por compra
 media_unidades_gf <- ggplot(media_unidades, aes(x = cluster, 
-                           y = media_unidades_por_compra,
-                           fill = cluster)) +
+                                                y = media_unidades_por_compra,
+                                                fill = cluster)) +
   geom_col() +
   labs(title = "Media de unidades por compra",
-       x = "clusteres", y = "unidades medias") +
+       x = "Clusters", y = "Unidades medias") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c(
-    "1" = "steelblue",  # azul
-    "2" = "grey",  # naranja
-    "3" = "green4",  # verde
-    "4" = "#d62728"   # rojo
-  )) 
+  scale_fill_manual(values = colores_clusters)
 
+# Media de días transcurridos por compra
 media_diasgf <- ggplot(media_dias, aes(x = cluster, 
-                                           y = media_de_dias_pasadas_por_compras,
-                                           fill = cluster)) +
+                                       y = media_de_dias_pasadas_por_compras,
+                                       fill = cluster)) +
   geom_col() +
-  labs(title = "Media de dias transcurridas por compra",
-       x = "clusteres", y = "media de dias") +
+  labs(title = "Media de días transcurridos por compra",
+       x = "Clusters", y = "Media de días") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c(
-    "1" = "steelblue",  # azul
-    "2" = "grey",  # naranja
-    "3" = "green4",  # verde
-    "4" = "#d62728"   # rojo
-  ))  
+  scale_fill_manual(values = colores_clusters)
 
+# Total de veces que han comprado
 total_comprasgf <- ggplot(total_compra, aes(x = cluster, 
-                           y = total_veces_que_ha_comprado,
-                           fill = cluster)) +
+                                            y = total_veces_que_ha_comprado,
+                                            fill = cluster)) +
   geom_col() +
   labs(title = "Total veces que han comprado",
-       x = "clusteres", y = "Total compras") +
+       x = "Clusters", y = "Total compras") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c(
-    "1" = "steelblue",  # azul
-    "2" = "grey",  # gris
-    "3" = "green4",  # verde
-    "4" = "#d62728"   # rojo
-  ))         
+  scale_fill_manual(values = colores_clusters)
+
 
 # Desactivar leyenda interna en cada gráfico
 media_unidades_gf_nolegend <- media_unidades_gf + theme(legend.position = "none")
