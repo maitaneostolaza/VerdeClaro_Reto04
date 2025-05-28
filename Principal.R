@@ -1,54 +1,107 @@
-usar_librerias <- function(paquetes) {
-  for (p in paquetes) {
-    if (!requireNamespace(p, quietly = TRUE)) {
-      message(paste("Instalando paquete:", p))
-      install.packages(p, dependencies = TRUE)
-    } else {
-      message(paste("Ya instalado:", p))
-    }
-    library(p, character.only = TRUE)
-  }
-}
+#1 Preporcesamiento de datos 
 
-mis_librerias <- c("ggplot2", "dplyr", "tidyr", "stringr","tidyverse","purrr",
-                   "plotly","naniar","VIM","lubridate","rsparse")
-usar_librerias(mis_librerias)
-
-beepr::beep(sound = 2)  # Hay sonidos del 1 al 11
+#1-1  Año 2021 Limpieza,Duplicados,Missing
+#
+source("Scripts_preprocesamiento/Preprocesamiento_2021.R", encoding = "UTF-8")
+#
+rm(list=ls())
 
 
-Objetivos <- readRDS("Datos\\Originales\\objetivos.RDS")
-#Objetivos <- as.data.frame(Objetivos)
+#1-2  Año 2022 Limpieza,Duplicados,Missing
+#
+source("Scripts_preprocesamiento/Preprocesamiento_2022.R", encoding = "UTF-8")
+#
+rm(list=ls())
 
-Maestroestr <- readRDS("Datos\\Originales\\maestroestr.RDS")
-Maestroestr <- as.data.frame(Maestroestr)
 
-tickets_enc <- readRDS("Datos\\Originales\\tickets_enc.RDS")
-tickets_enc <- as.data.frame(tickets_enc)
+#1-3  Año 2023 Limpieza,Duplicados,Missing
+#
+source("Scripts_preprocesamiento/Preprocesamiento_2023.R", encoding = "UTF-8")
+#
+rm(list=ls())
 
-# Cargar librería
-library(ggplot2)
 
-# Definir paleta de colores
-eroski_colors <- c(
-  "#e60026",  # rojo
-  "#0066b3",  # azul
-  "#ffffff",  # blanco
-)
+#1-4  Creacion Ratios 
+#
+source("Analisis_Exploratorio/Ratios.R", encoding = "UTF-8")
+#
+rm(list=ls())
 
-# Crear datos de ejemplo
-datos <- data.frame(
-  categoria = c("Fruta", "Verdura", "Pan", "Lácteos", "Bebidas"),
-  ventas = c(120, 95, 80, 65, 110)
-)
 
-# Gráfico de barras
-ggplot(datos, aes(x = categoria, y = ventas, fill = categoria)) +
-  geom_bar(stat = "identity") +
-  scale_fill_manual(values = eroski_colors[1:5]) +
-  theme_dark() +
-  labs(
-    title = "Ventas por categoría",
-    x = "Categoría",
-    y = "Unidades vendidas"
-  )
+#1-5  Outliers Para los ficheros de todos los años
+#
+source("Scripts_preprocesamiento/Outliers.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+
+#2 Clusters, Api Lista y Recomendaciones
+
+#2-1 Clustering
+source("Modelos/Clusters.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+#2-2 API ventana
+source("Analisis_Exploratorio/EjecutarAPI.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+#2-3 Listas de los clusters con las empresas recomendadas
+source("Modelos/Listas.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+#2-3 Recomendaciones Empresas
+source("Modelos/Recomendaciones.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+
+#3 Otros Scripts como Analisis Exploratorio, Graficos, Mate...
+
+#3-1 Analisis Exploratorio
+#
+source("Analisis_Exploratorio/AnalisisExploratorio.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+#3-2  Analisis Ratios
+#
+source("Analisis_Exploratorio/AnalisisRatios.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+#3-3  Graficos Para el analisis 2021
+#
+source("Scripts_EDA/analisis graficos 2021.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+#3-4  Graficos Para el analisis 2022
+#
+source("Scripts_EDA/analisis graficos 2022.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+#3-5  Graficos Para el analisis 2023
+#
+source("Scripts_EDA/analisis graficos 2023.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+#3-6  Matematica
+#
+source("Scripts_EDA/matematicas Reto3.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+
