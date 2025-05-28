@@ -189,56 +189,73 @@ item_emb
 dim(item_emb)
 item_emb_n <- t(modelo_wrmf$components)
 
-comprobacion2 <- user_emb[rownames(user_emb) %in% objetivos$objetivo2$obj,] %*% item_emb[] 
+# mirar items mas parecidos al item recomendado y mirar si los han comprado anteriormente
 
-# VAMOS A MIRAR LOS CLIENTES QUE MAS SE PARECEN A CADA USUARIO Y VER SI HAN COMPRADO
-# EL PRODUCTO QUE SE LE HA RECOMENDADO A ESTOS 10 CLIENTES
-# USUARIOS PARECIDOS: 
-biderketa2 <- user_emb[] %*% user_emb[rownames(user_emb) %in% objetivos$objetivo2$obj,] 
+items_parecidos <- list()  # Lista para guardar los ítems similares de cada uno
 
-# creamos funcion para encontrar el usuario mas parecido por cada usuario del objetivo 2: 
-# Vector con usuarios objetivo
-usuarios_mas_parecidos <- function(user_emb, objetivos, top_n = 3) {
-  usuarios_objetivo <- objetivos$objetivo2$obj
+for(i in 1:10){
+  # Extrae el nombre del ítem objetivo
+  item_objetivo <- objetivo2_resultado$cod_est[i]
   
-  resultados <- data.frame(
-    usuario_objetivo = character(),
-    usuario_parecido = character(),
-    similitud = numeric(),
-    stringsAsFactors = FALSE
-  )
+  # Embedding del ítem objetivo
+  emb_objetivo <- item_emb[, colnames(item_emb) == item_objetivo]
+  
+  # Calcular similitud (producto punto) con todos los ítems
+  similitudes <- as.vector(t(emb_objetivo) %*% item_emb)
+  
+  # Ordenar por similitud
+  items_parecidos_i <- sort(similitudes, decreasing = TRUE, index.return = TRUE)
+  
+  # Obtener nombres de los ítems más parecidos (excluyendo el propio ítem objetivo)
+  similares <- colnames(item_emb)[items_parecidos_i$ix]
+  similares <- similares[similares != item_objetivo][1:5]  # los 10 más similares (excluyendo el mismo)
+  
+  # Guardar en la lista
+  items_parecidos[[item_objetivo]] <- similares
+}
+
+# Puedes ver los ítems similares así:
+items_parecidos
+
+# ----- MIRAR SI LOS USUARIOS HAN COMPRADO ANTERIORMENTE ESOS 10 ITEMS MAS PARECIDOS
+verificar_compras_items_similares <- function(usuarios_objetivo, items_parecidos, matriz_compras) {
+  resultados <- data.frame()
   
   for (usuario in usuarios_objetivo) {
-    if (!(usuario %in% rownames(user_emb))) {
-      warning(paste("Usuario no encontrado:", usuario))
+    if (!usuario %in% rownames(matriz_compras)) {
+      warning(paste("Usuario", usuario, "no está en la matriz de compras. Se omite."))
       next
     }
     
-    emb_obj <- user_emb[usuario, , drop = FALSE]
-    similitudes <- user_emb %*% t(emb_obj)
-    similitudes_vec <- as.vector(similitudes)
-    names(similitudes_vec) <- rownames(user_emb)
-    
-    # Excluir el mismo usuario
-    similitudes_vec[usuario] <- -Inf
-    
-    # Obtener los top N más parecidos
-    top_idx <- order(similitudes_vec, decreasing = TRUE)[1:top_n]
-    
-    resultados <- rbind(resultados, data.frame(
-      usuario_objetivo = rep(usuario, top_n),
-      usuario_parecido = names(similitudes_vec)[top_idx],
-      similitud = similitudes_vec[top_idx],
-      stringsAsFactors = FALSE
-    ))
+    for (item_objetivo in names(items_parecidos)) {
+      items_similares <- items_parecidos[[item_objetivo]]
+      
+      for (item in items_similares) {
+        if (!item %in% colnames(matriz_compras)) {
+          comprado <- NA  # El ítem no está en la matriz
+        } else {
+          comprado <- matriz_compras[usuario, item]
+          comprado <- ifelse(is.na(comprado), NA, comprado == 1)
+        }
+        
+        resultados <- rbind(resultados, data.frame(
+          usuario = usuario,
+          item_objetivo = item_objetivo,
+          item_similar = item,
+          comprado = comprado
+        ))
+      }
+    }
   }
   
   return(resultados)
 }
 
-resultados <- usuarios_mas_parecidos(user_emb,objetivos, top_n = 5)
-print(resultados)
+resultados <- verificar_compras_items_similares(objetivos$objetivo2$obj, items_parecidos, matriz_general) 
+ 
+resultados <- resultados %>% filter(comprado==T)
 
+saveRDS(resultados,"Datos\\Resultados\\comprobacion_objetivo2.rds")
 
 # ----------------------------------- OBJETIVO 3: 
 # las matrices de usuario e item son iguales que para el objetivo 2

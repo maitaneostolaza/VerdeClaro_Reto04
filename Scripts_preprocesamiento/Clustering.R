@@ -209,7 +209,7 @@ medias <- readRDS("Datos/Resultados/Centroides_clusteres.rds")
 media1 <- mean(medias$media_unidades_por_compra)
 media2 <- mean(medias$media_de_dias_pasadas_por_compras)
 media3 <- mean(medias$total_veces_que_ha_comprado)
-mean(media1,media2,media3) # centroide de todo el dataset (data mining)
+mean(media1,media2,media3) # centroide de todo el dataset (data mining), 14.02375
 
 
 
