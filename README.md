@@ -3,36 +3,36 @@
 Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centrado en construir un sistema de recomendación basado en datos reales de compra facilitados por EROSKI. La organización de carpetas permite localizar fácilmente cada componente del proyecto:
 
 ```plaintext
-├── Aplicaciones/                  # Aplicaciones ejecutables del proyecto
-│   ├── Api.R                      # Código principal de la API (Plumber)
+├── Aplicaciones/                  # Aplicaciones ejecutables
+│   ├── Api.R                      # Código principal de la API con Plumber
 │   ├── EjecutarApi.R              # Script para lanzar la API localmente
 │   └── ShinyApp.R                 # Aplicación Shiny para visualización interactiva
 │
 ├── Datos/
-│   ├── Originales/                # Datos originales proporcionados (.RDS)
-│   ├── Transformados/             # Datos filtrados y preparados para análisis
-│   └── Resultados/                # Resultados generados por los distintos modelos
+│   ├── Originales/                # Datos originales entregados por EROSKI (.RDS)
+│   ├── Transformados/             # Datos filtrados, limpiados y estructurados
+│   └── Resultados/                # Salidas de modelos, matrices y comprobaciones
 │
-├── Graficos/                      # Imágenes y visualizaciones generadas
+├── Graficos/                      # Visualizaciones y gráficos generados
 │
-├── Modelos/                       # Scripts con lógica de recomendación
-│   ├── Recomendadores binarizadas.R       # Alternativa usando binarización
-│   ├── Comparando algoritmos.R            # Evaluación de distintos algoritmos
-│   └── reglas_de_asociacion.R             # Reglas de asociación (Apriori, Eclat)
+├── Modelos/                       # Scripts de modelos y recomendadores
+│   ├── Comparando algoritmos.R
+│   ├── Recomendadores binarizadas.R
+│   └── reglas_de_asociacion.R
 │
-├── Scripts_Estadisticos/
-│   └── AnalisisDescriptivos.R             # Análisis exploratorios y gráficos
+├── Scripts_Estadisticos/          # Análisis descriptivo y exploratorio
+│   └── AnalisisDescriptivos.R
 │
-├── Scripts_preprocesamiento/
-│   ├── Limpieza de datos.R                # Comprobaciones y transformaciones iniciales
-│   ├── Limpieza de datos Reduccion.R      # Aplicación de filtros y reducción de datos
-│   ├── Clustering.R                       # Agrupación de clientes con k-means
-│   ├── matriz.R                           # Generación de matriz cliente-producto
-│   └── Librerias.R                        # Carga de paquetes utilizados
+├── Scripts_preprocesamiento/      # Limpieza, reducción y clustering
+│   ├── Limpieza de datos.R
+│   ├── Limpieza de datos Reduccion.R
+│   ├── Clustering.R
+│   ├── matriz.R
+│   └── Librerias.R
 │
-├── Principal.R                   # Script integrador general del proyecto
-├── RETO04_VerdeClaro_R.Rproj     # Proyecto RStudio
-└── README.md                     # Este documento
+├── Principal.R                    # Script central de integración y ejecución
+├── RETO04_VerdeClaro_R.Rproj      # Archivo de proyecto RStudio
+└── README.md                      # Este documento
 ```
 
 🌿 Ramas del repositorio
