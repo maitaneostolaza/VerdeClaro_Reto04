@@ -33,23 +33,16 @@ maestro    <- readRDS("../Datos/Originales/maestroestr.RDS")
 function() {
   resultado1_df <- as.data.frame(resultado1)
   
-  # Nombre del producto es el nombre de la única columna
   nombre_prod <- colnames(resultado1_df)[1]
   
-  # Los códigos de producto están en los rownames
-  codigos <- rownames(resultado1_df)
-  clientes <- resultado1_df[[1]]
+  clientes <- resultado1_df[[1]] %>% as.character()
   
-  # Generar una entrada por cada cliente
-  recomendaciones <- map2(codigos, clientes, function(cod, cliente) {
-    list(
-      producto_recomendado = nombre_prod,
-      clientes_recomendados = cliente
-    )
-  })
-  
-  return(recomendaciones)
+  return(list(
+    producto_promocionado_nombre = list(nombre_prod),
+    clientes_recomendados = clientes
+  ))
 }
+
 
 
 #* Recomendación: otros como tú han comprado (Objetivo 2)
