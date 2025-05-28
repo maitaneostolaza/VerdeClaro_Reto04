@@ -67,7 +67,8 @@ rm(list=ls())
 
 #3-2  App Shiny
 #
-source("Aplicaciones/ShinyApp.R", encoding = "UTF-8")
+app <- source("Aplicaciones/ShinyApp.R", local = TRUE)$value
+runApp(app)
 #
 rm(list=ls())
 
