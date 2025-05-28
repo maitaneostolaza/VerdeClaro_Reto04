@@ -52,7 +52,10 @@ Una vez finalizado el proyecto, se procederá a hacer merge de las ramas.
 ---
 
 ## 🧭 Cómo probar la API de Recomendaciones
-Una vez tengas abierta la **interfaz de la API en tu navegador**, verás una pantalla con todas las funcionalidades disponibles. Desde ahí puedes probarlas fácilmente **sin necesidad de escribir código**.
+Una vez tengas abierta la **interfaz de la API en tu navegador**, verás una pantalla con todas las funcionalidades disponibles. Hemos dejado preparados algunos identificadores de cliente para que puedas probar fácilmente cómo funciona cada recomendador.
+Puedes verlos directamente en la parte superior de la interfaz, dentro de la descripción de la API.
+
+📝 Algunos de estos clientes obtendrán una recomendación, y otros no, simplemente porque no seran de ese recomendador. Así puedes ver cómo responde la API en ambos casos.
 
 A continuación, te explicamos cómo funciona cada una:
 
