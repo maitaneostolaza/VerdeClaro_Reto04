@@ -4,39 +4,52 @@ library(tidyr)
 library(readr)
 library(purrr)
 
+#* @apiTitle API de recomendación de productos
+#* @apiDescription Esta es una API que recomienda productos a clientes.<br><br>
+#* <b>Ejemplos para probar los endpoints:</b><br><br>
+#* <b>Objetivo 2 - Otros como tú han comprado</b><br>
+#* 26f424b3bba6aaf97952ac599ed39f75<br>
+#* 8b9aa623b654a8be21b316a5fdf41007<br>
+#* 339d3222968f1b34f7ef40429a179efd<br><br>
+#* <b>Objetivo 3 - Producto en oferta más adecuado</b><br>
+#* 000c75b30bb0b237ec817d203e88a54f<br>
+#* 00322c1d439808b60d1e5717956afa8e<br>
+#* 503a6539df48964124fe026b9deb5d13<br><br>
+#* <b>Objetivo 4 - Ítem olvidado</b><br>
+#* 503a6539df48964124fe026b9deb5d13<br>
+#* 1d98f84a5f074ed9c7a47515d4f5f329<br>
+#* 26f424b3bba6aaf97952ac599ed39f75<br>
+
 # Cargar datos de resultados finales
-resultado1 <- readRDS("Datos/Resultados/Objetivo1_resultado.rds")
-resultado2 <- readRDS("Datos/Resultados/Objetivo2_resultado.rds")
-resultado3 <- readRDS("Datos/Resultados/Objetivo3_resultado.rds")
-resultado4 <- readRDS("Datos/Resultados/Objetivo4_resultado.rds")
-maestro    <- readRDS("Datos/Originales/maestroestr.RDS")
+resultado1 <- readRDS("../Datos/Resultados/Objetivo1_resultado.rds")
+resultado2 <- readRDS("../Datos/Resultados/Objetivo2_resultado.rds")
+resultado3 <- readRDS("../Datos/Resultados/Objetivo3_resultado.rds")
+resultado4 <- readRDS("../Datos/Resultados/Objetivo4_resultado.rds")
+maestro    <- readRDS("../Datos/Originales/maestroestr.RDS")
 
 
-#* Recomendación: artículo promocionado (Objetivo 1 adaptado)
-#* @get recomendar_promocion
-function(){
-  # El nombre del producto está como rowname o primera columna
-  nombre_prod <- rownames(resultado1)[1]
-  if (is.null(nombre_prod)) {
-    nombre_prod <- resultado1[1, 1]
-  }
+#* Recomendación: artículos promocionados (Objetivo 1)
+#* @get /recomendar_promocion
+function() {
+  resultado1_df <- as.data.frame(resultado1)
   
-  # Obtener los clientes (valores de la fila, excepto la 1ª si es nombre)
-  clientes <- as.character(resultado1[1, ])
-  clientes <- clientes[clientes != nombre_prod]  # eliminar el nombre del producto si aparece como valor
+  # Nombre del producto es el nombre de la única columna
+  nombre_prod <- colnames(resultado1_df)[1]
   
-  # Buscar código del producto a partir del nombre (en maestro)
-  cod_prod <- maestro %>%
-    filter(descripcion == nombre_prod) %>%
-    pull(cod_est)
+  # Los códigos de producto están en los rownames
+  codigos <- rownames(resultado1_df)
+  clientes <- resultado1_df[[1]]
   
-  return(list(
-    producto_promocionado_cod = cod_prod,
-    producto_promocionado_nombre = nombre_prod,
-    clientes_recomendados = clientes
-  ))
+  # Generar una entrada por cada cliente
+  recomendaciones <- map2(codigos, clientes, function(cod, cliente) {
+    list(
+      producto_recomendado = nombre_prod,
+      clientes_recomendados = cliente
+    )
+  })
+  
+  return(recomendaciones)
 }
-
 
 
 #* Recomendación: otros como tú han comprado (Objetivo 2)

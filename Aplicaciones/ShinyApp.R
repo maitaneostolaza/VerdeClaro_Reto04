@@ -119,7 +119,9 @@ total_comprasgf <- ggplot(total_compra, aes(x = cluster, y = total_veces_que_ha_
 media_unidades_gf_nolegend <- media_unidades_gf + theme(legend.position = "none")
 media_diasgf_nolegend <- media_diasgf + theme(legend.position = "none")
 total_comprasgf_nolegend <- total_comprasgf + theme(legend.position = "none")
-shared_legend <- get_legend(media_unidades_gf + theme(legend.position = "right", legend.direction = "horizontal"))
+shared_legend <- suppressWarnings(
+  get_legend(media_unidades_gf + theme(legend.position = "right", legend.direction = "horizontal"))
+)
 
 final_plot <- plot_grid(
   plot_grid(media_unidades_gf_nolegend, media_diasgf_nolegend, total_comprasgf_nolegend, ncol = 3),
@@ -131,7 +133,7 @@ final_plot <- plot_grid(
 # 2. Otros gráficos por cluster
 productos_generales_mas_comprados <- df %>%
   group_by(cluster, producto_general) %>%
-  summarise(cantidad_producto = n()) %>%
+  summarise(cantidad_producto = n(), .groups = "drop") %>%
   slice_max(order_by = cantidad_producto, n = 5, with_ties = FALSE)
 
 gf_productos_generales_mas_comprados <- ggplot(productos_generales_mas_comprados, aes(x = cantidad_producto, y = reorder(producto_general, cantidad_producto))) +
@@ -143,7 +145,7 @@ gf_productos_generales_mas_comprados <- ggplot(productos_generales_mas_comprados
 
 productos_generales_menos_comprados <- df %>%
   group_by(cluster, producto_general) %>%
-  summarise(cantidad_producto = n()) %>%
+  summarise(cantidad_producto = n(), .groups = "drop") %>%
   slice_min(order_by = cantidad_producto, n = 5, with_ties = FALSE)
 
 gf_productos_generales_menos_comprados <- ggplot(productos_generales_menos_comprados, aes(x = cantidad_producto, y = reorder(producto_general, cantidad_producto))) +
@@ -155,7 +157,7 @@ gf_productos_generales_menos_comprados <- ggplot(productos_generales_menos_compr
 
 productos_mas_comprados <- df %>%
   group_by(cluster, descripcion) %>%
-  summarise(cantidad_producto = n()) %>%
+  summarise(cantidad_producto = n(), .groups = "drop") %>%
   slice_max(order_by = cantidad_producto, n = 5, with_ties = FALSE)
 
 gf_productos_mas_comprados <- ggplot(productos_mas_comprados, aes(x = cantidad_producto, y = reorder(descripcion, cantidad_producto))) +
@@ -167,7 +169,7 @@ gf_productos_mas_comprados <- ggplot(productos_mas_comprados, aes(x = cantidad_p
 
 productos_menos_comprados <- df %>%
   group_by(cluster, descripcion) %>%
-  summarise(cantidad_producto = n()) %>%
+  summarise(cantidad_producto = n(), .groups = "drop") %>%
   slice_min(order_by = cantidad_producto, n = 5, with_ties = FALSE)
 
 gf_productos_menos_comprados <- ggplot(productos_menos_comprados, aes(x = cantidad_producto, y = reorder(descripcion, cantidad_producto))) +
@@ -184,7 +186,7 @@ top20_productos <- df %>%
 
 top20_cluster <- df %>%
   group_by(cluster, descripcion) %>%
-  summarise(cantidad_producto = n()) %>%
+  summarise(cantidad_producto = n(), .groups = "drop") %>%
   filter(descripcion %in% top20_productos)
 
 top20prods_total_por_cluster <- ggplot(top20_cluster, aes(x = cantidad_producto, y = reorder(descripcion, cantidad_producto), fill = cluster)) +
@@ -408,7 +410,7 @@ server <- function(input, output, session) {
     
     filtros$df %>%
       group_by(fecha) %>%
-      summarise(tickets = n_distinct(id_cliente_enc)) %>%
+      summarise(tickets = n_distinct(id_cliente_enc), .groups = "drop") %>%
       ggplot(aes(x = fecha, y = tickets)) +
       geom_line(color = "#0074B5") +
       labs(title = "Número de tickets por día", x = "Fecha", y = "Clientes únicos") +
