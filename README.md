@@ -1,6 +1,7 @@
-## 🗂️ Estructura del proyecto
+## 📂 Estructura del Proyecto de Data Science - Reto 4
 
 Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centrado en construir un sistema de recomendación basado en datos reales de compra facilitados por EROSKI. La organización de carpetas permite localizar fácilmente cada componente del proyecto:
+
 
 ```plaintext
 ├── Aplicaciones/                  # Aplicaciones ejecutables
@@ -35,7 +36,10 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 └── README.md                      # Este documento
 ```
 
-🌿 Ramas del repositorio
+
+---
+
+## 🌿 Ramas del repositorio
 Durante el desarrollo del proyecto se han utilizado diferentes ramas para organizar el trabajo por bloques funcionales:
 
 main: rama principal y estable del proyecto.
@@ -48,49 +52,48 @@ Api: construcción y pruebas de la API REST con Plumber.
 
 Una vez finalizado el proyecto, se procederá a hacer merge de las ramas.
 
-🧭 Cómo probar la API de Recomendaciones
-Una vez tengas abierta la interfaz de la API en tu navegador, verás una pantalla con todas las funcionalidades disponibles. Desde ahí puedes probarlas fácilmente sin necesidad de escribir código.
+---
+
+## 🧭 Cómo probar la API de Recomendaciones
+Una vez tengas abierta la **interfaz de la API en tu navegador**, verás una pantalla con todas las funcionalidades disponibles. Desde ahí puedes probarlas fácilmente **sin necesidad de escribir código**.
 
 A continuación, te explicamos cómo funciona cada una:
 
-🔹 Recomendación de producto promocionado (/recomendar_promocion)
-Devuelve el producto promocionado y los 10 clientes seleccionados como receptores ideales.
+---
 
-Haz clic en recomendar_promocion.
+### 🔹 **/recomendar_promocion**  
+📌 Devuelve el producto promocionado y los **10 clientes seleccionados** como receptores ideales.
 
-Pulsa “Try it out” y después “Execute”.
+1. Haz clic en `recomendar_promocion`.  
+2. Pulsa **“Try it out”** y después **“Execute”**.  
+3. Verás el **código y nombre del producto**, y la lista de **clientes recomendados**.
 
-Verás el código y nombre del producto, y la lista de clientes recomendados.
+---
 
-🔹 Recomendación basada en clientes similares (/recomendar_otros_como_tu)
-Devuelve el producto que otros clientes similares han comprado, pero que el cliente indicado aún no ha adquirido.
+### 🔹 **/recomendar_otros_como_tu**  
+📌 Devuelve el producto que otros clientes similares han comprado, pero que el cliente indicado aún no ha adquirido.
 
-Haz clic en recomendar_otros_como_tu.
+1. Haz clic en `recomendar_otros_como_tu`.  
+2. Pulsa **“Try it out”**.  
+3. Introduce un `cliente_id` del objetivo 2.  
+4. Pulsa **“Execute”** y consulta el resultado.
 
-Pulsa “Try it out”.
+---
 
-Introduce un cliente_id del objetivo 2.
+### 🔹 **/recomendar_oferta**  
+📌 Devuelve qué producto en oferta se le asigna a un cliente específico.
 
-Pulsa “Execute” y consulta el resultado.
+1. Haz clic en `recomendar_oferta`.  
+2. Pulsa **“Try it out”**.  
+3. Introduce un `cliente_id` del objetivo 3.  
+4. Pulsa **“Execute”** para ver el **producto recomendado**.
 
-🔹 Recomendación de producto en oferta (/recomendar_oferta)
-Devuelve qué producto en oferta se le asigna a un cliente específico.
+---
 
-Haz clic en recomendar_oferta.
+### 🔹 **/recomendar_olvido**  
+📌 Identifica qué producto ha podido olvidar el cliente en su última compra.
 
-Pulsa “Try it out”.
-
-Introduce un cliente_id del objetivo 3.
-
-Pulsa “Execute” para ver el producto recomendado.
-
-🔹 Recomendación de producto olvidado (/recomendar_olvido)
-Identifica qué producto ha podido olvidar el cliente en su última compra.
-
-Despliega recomendar_olvido.
-
-Pulsa “Try it out”.
-
-Introduce un cliente_id del objetivo 4.
-
-Pulsa “Execute” y obtendrás el producto olvidado (si lo hay).
+1. Despliega `recomendar_olvido`.  
+2. Pulsa **“Try it out”**.  
+3. Introduce un `cliente_id` del objetivo 4.  
+4. Pulsa **“Execute”** y obtendrás el **producto olvidado** (si lo hay).
