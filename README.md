@@ -16,7 +16,6 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 ├── Graficos/                      # Imágenes y visualizaciones generadas
 │
 ├── Modelos/                       # Scripts con lógica de recomendación
-│   ├── Recomendadores.R                   # Recomendadores generales (objetivos 1–4)
 │   ├── Recomendadores binarizadas.R       # Alternativa usando binarización
 │   ├── Comparando algoritmos.R            # Evaluación de distintos algoritmos
 │   └── reglas_de_asociacion.R             # Reglas de asociación (Apriori, Eclat)
@@ -43,13 +42,11 @@ main: rama principal y estable del proyecto.
 
 Recomendadores: desarrollo de los distintos sistemas de recomendación.
 
-Mate: análisis estadístico, cálculos exploratorios y validaciones.
-
 Shinny: implementación de la app interactiva en Shiny.
 
 Api: construcción y pruebas de la API REST con Plumber.
 
-Una vez finalizado el proyecto, se procederá a hacer merge de los archivos más relevantes de cada rama en main y se eliminarán las ramas auxiliares.
+Una vez finalizado el proyecto, se procederá a hacer merge de las ramas.
 
 🧭 Cómo probar la API de Recomendaciones
 Una vez tengas abierta la interfaz de la API en tu navegador, verás una pantalla con todas las funcionalidades disponibles. Desde ahí puedes probarlas fácilmente sin necesidad de escribir código.
