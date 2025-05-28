@@ -1,107 +1,72 @@
 #1 Preporcesamiento de datos 
 
-#1-1  Año 2021 Limpieza,Duplicados,Missing
+#1-1  Limpieza de datos Duplicados
 #
-source("Scripts_preprocesamiento/.R", encoding = "UTF-8")
-#
-rm(list=ls())
-
-
-#1-2  Año 2022 Limpieza,Duplicados,Missing
-#
-source("Scripts_preprocesamiento/Preprocesamiento_2022.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Limpieza de datos.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
-#1-3  Año 2023 Limpieza,Duplicados,Missing
+#1-2 Clustering
 #
-source("Scripts_preprocesamiento/Preprocesamiento_2023.R", encoding = "UTF-8")
-#
-rm(list=ls())
-
-
-#1-4  Creacion Ratios 
-#
-source("Analisis_Exploratorio/Ratios.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Clustering.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
-#1-5  Outliers Para los ficheros de todos los años
+#1-3  Limpieza de datos Reduccion de dataset
 #
-source("Scripts_preprocesamiento/Outliers.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Limpieza de datos Reduccion.R", encoding = "UTF-8")
+#
+rm(list=ls())
+
+
+#1-4  Matriz
+#
+source("Scripts_preprocesamiento/matriz.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
 
-#2 Clusters, Api Lista y Recomendaciones
+#2 Modelos
 
-#2-1 Clustering
-source("Modelos/Clusters.R", encoding = "UTF-8")
+#2-1 Algoritmos
+source("Modelos/Comparando algoritmos.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
-#2-2 API ventana
-source("Analisis_Exploratorio/EjecutarAPI.R", encoding = "UTF-8")
+#2-2 Recomendadores binarizadas
+source("Modelos/Recomendadores binarizadas.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
-#2-3 Listas de los clusters con las empresas recomendadas
-source("Modelos/Listas.R", encoding = "UTF-8")
-#
-rm(list=ls())
-
-#2-3 Recomendaciones Empresas
-source("Modelos/Recomendaciones.R", encoding = "UTF-8")
+#2-3 Reglas de asociacion
+source("Modelos/reglas_de_asociacion.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
 
-#3 Otros Scripts como Analisis Exploratorio, Graficos, Mate...
+#3 Otros Scripts como Aplicaciones, Graficos...
 
-#3-1 Analisis Exploratorio
+#3-1 Api con los objetivos recomendadores
 #
-source("Analisis_Exploratorio/AnalisisExploratorio.R", encoding = "UTF-8")
-#
-rm(list=ls())
-
-
-#3-2  Analisis Ratios
-#
-source("Analisis_Exploratorio/AnalisisRatios.R", encoding = "UTF-8")
-#
-rm(list=ls())
-
-#3-3  Graficos Para el analisis 2021
-#
-source("Scripts_EDA/analisis graficos 2021.R", encoding = "UTF-8")
+source("Aplicaciones/EjecutarApi.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
-#3-4  Graficos Para el analisis 2022
+#3-2  App Shiny
 #
-source("Scripts_EDA/analisis graficos 2022.R", encoding = "UTF-8")
-#
-rm(list=ls())
-
-
-#3-5  Graficos Para el analisis 2023
-#
-source("Scripts_EDA/analisis graficos 2023.R", encoding = "UTF-8")
+source("Aplicaciones/ShinyApp.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
-#3-6  Matematica
+#3-3  Graficos para analisis descriptivo
 #
-source("Scripts_EDA/matematicas Reto3.R", encoding = "UTF-8")
+source("Scripts_Estadisticos/AnalisisDescriptivos.R", encoding = "UTF-8")
 #
 rm(list=ls())
-
-
-
