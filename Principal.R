@@ -48,6 +48,12 @@ source("Modelos/reglas_de_asociacion.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
+#2-4 Objetivo 4 en modo Lista
+lista_obj_4 <- readRDS("Datos/Resultados/Comprobacion_objetivo4.rds")
+lista_obj_4
+#
+rm(list=ls())
+
 
 
 #3 Otros Scripts como Aplicaciones, Graficos...
