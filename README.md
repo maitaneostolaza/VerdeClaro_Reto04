@@ -16,7 +16,6 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 ├── Graficos/                      # Imágenes y visualizaciones generadas
 │
 ├── Modelos/                       # Scripts con lógica de recomendación
-│   ├── Recomendadores.R                   # Recomendadores generales (objetivos 1–4)
 │   ├── Recomendadores binarizadas.R       # Alternativa usando binarización
 │   ├── Comparando algoritmos.R            # Evaluación de distintos algoritmos
 │   └── reglas_de_asociacion.R             # Reglas de asociación (Apriori, Eclat)
