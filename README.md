@@ -1,23 +1,25 @@
-🗂️ Estructura del proyecto
+## 🗂️ Estructura del proyecto
+
 Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centrado en construir un sistema de recomendación basado en datos reales de compra facilitados por EROSKI. La organización de carpetas permite localizar fácilmente cada componente del proyecto:
 
-├── Aplicaciones/              # Aplicaciones ejecutables del proyecto
-│   ├── Api.R                  # Código principal de la API (Plumber)
-│   ├── EjecutarApi.R          # Script para lanzar la API localmente
-│   └── ShinyApp.R             # Aplicación Shiny para visualización interactiva
+```plaintext
+├── Aplicaciones/                  # Aplicaciones ejecutables del proyecto
+│   ├── Api.R                      # Código principal de la API (Plumber)
+│   ├── EjecutarApi.R              # Script para lanzar la API localmente
+│   └── ShinyApp.R                 # Aplicación Shiny para visualización interactiva
 │
 ├── Datos/
-│   ├── Originales/            # Datos originales proporcionados por EROSKI (.RDS)
-│   ├── Transformados/         # Datos filtrados y preparados para análisis
-│   └── Resultados/            # Resultados generados por los modelos y la API
+│   ├── Originales/                # Datos originales proporcionados (.RDS)
+│   ├── Transformados/             # Datos filtrados y preparados para análisis
+│   └── Resultados/                # Resultados generados por los distintos modelos
 │
-├── Graficos/                  # Visualizaciones generadas durante el análisis
+├── Graficos/                      # Imágenes y visualizaciones generadas
 │
-├── Modelos/                   # Scripts con lógica de recomendación
-│   ├── Recomendadores.R                   # Lógica principal de los 4 recomendadores
-│   ├── Recomendadores binarizadas.R       # Versión alternativa con binarización
-│   ├── Comparando algoritmos.R            # Evaluación de rendimiento de modelos
-│   └── reglas_de_asociacion.R             # Reglas de asociación tipo Apriori/Eclat
+├── Modelos/                       # Scripts con lógica de recomendación
+│   ├── Recomendadores.R                   # Recomendadores generales (objetivos 1–4)
+│   ├── Recomendadores binarizadas.R       # Alternativa usando binarización
+│   ├── Comparando algoritmos.R            # Evaluación de distintos algoritmos
+│   └── reglas_de_asociacion.R             # Reglas de asociación (Apriori, Eclat)
 │
 ├── Scripts_Estadisticos/
 │   └── AnalisisDescriptivos.R             # Análisis exploratorios y gráficos
@@ -29,9 +31,11 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 │   ├── matriz.R                           # Generación de matriz cliente-producto
 │   └── Librerias.R                        # Carga de paquetes utilizados
 │
-├── Principal.R                 # Script integrador general del proyecto
-├── RETO04_VerdeClaro_R.Rproj   # Proyecto de RStudio
-└── README.md                   # Este documento
+├── Principal.R                   # Script integrador general del proyecto
+├── RETO04_VerdeClaro_R.Rproj     # Proyecto RStudio
+└── README.md                     # Este documento
+```
+
 🌿 Ramas del repositorio
 Durante el desarrollo del proyecto se han utilizado diferentes ramas para organizar el trabajo por bloques funcionales:
 
