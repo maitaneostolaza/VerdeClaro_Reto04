@@ -86,14 +86,6 @@ tickets <- tickets %>%
     )
   )
 
-producto_mas_comprado <- tickets %>%
-  group_by(id_cliente_enc, producto_general,num_ticket) %>%
-  summarise(veces_comprado = n(), .groups = "drop") %>%
-  group_by(id_cliente_enc) %>%
-  slice_max(order_by = veces_comprado, n = 1, with_ties = FALSE)
-
-producto_mas_comprado <- producto_mas_comprado %>% 
-  select(id_cliente_enc,producto_general)
 
 # JUNTAR LAS COLUMNAS 
 df_clustering <- inner_join(cantidad_productos,cada_cuanto_compras, by = "id_cliente_enc")
@@ -206,71 +198,68 @@ media_clusteres <- df_entero %>%
   group_by(cluster) %>%
   summarise(across(where(is.numeric), mean))
 
-productos_menos_comprados <- df_entero %>% 
-  group_by(cluster,producto_general) %>% 
-  summarise(cantidad_producto = n()) %>% 
-  slice_min(order_by = cantidad_producto, n = 3, with_ties = TRUE)
+media_clusteres$media_unidades_por_compra <- round(media_clusteres$media_de_dias_pasadas_por_compras,3)
+media_clusteres$media_de_dias_pasadas_por_compras <- round(media_clusteres$media_de_dias_pasadas_por_compras,3)
+media_clusteres$total_veces_que_ha_comprado <- round(media_clusteres$total_veces_que_ha_comprado,3)
 
-productos_mas_comprados <- df_entero %>% 
-  group_by(cluster,producto_general) %>% 
-  summarise(cantidad_producto = n()) %>% 
-  slice_max(order_by = cantidad_producto, n = 3, with_ties = TRUE)
+saveRDS(media_clusteres,"Datos/Resultados/Centroides_clusteres.rds")
+
+medias <- readRDS("Datos/Resultados/Centroides_clusteres.rds")
+
+media1 <- mean(medias$media_unidades_por_compra)
+media2 <- mean(medias$media_de_dias_pasadas_por_compras)
+media3 <- mean(medias$total_veces_que_ha_comprado)
+mean(media1,media2,media3) # centroide de todo el dataset (data mining), 14.02375
 
 
-# --------------------------- GRAFICOS 
-# paleta de colores
-paletteer_c("ggthemes::Red-Green Diverging", 30)
+
+# --------------------------- GRAFICOS = CARACTERIZACION DE CLUSTERES 
+
 
 # grafico de barras por columna  
 media_unidades <- media_clusteres[,c(1,2)]
 media_dias <- media_clusteres[,c(1,3)]
 total_compra <- media_clusteres[c(1,4)]
 
-# Crear gráfico de barras facetado
+# Paleta actualizada (usamos los primeros 4 colores)
+colores_clusters <- c("1" = "#E10A23",   # rojo intenso
+                      "2" = "#A2CBE8",   # rojo oscuro
+                      "3" = "#005B92",   # rosa claro
+                      "4" = "#F0928E")   # rosa pálido
+
+# Media de unidades por compra
 media_unidades_gf <- ggplot(media_unidades, aes(x = cluster, 
-                           y = media_unidades_por_compra,
-                           fill = cluster)) +
+                                                y = media_unidades_por_compra,
+                                                fill = cluster)) +
   geom_col() +
   labs(title = "Media de unidades por compra",
-       x = "clusteres", y = "unidades medias") +
+       x = "Clusters", y = "Unidades medias") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c(
-    "1" = "steelblue",  # azul
-    "2" = "grey",  # naranja
-    "3" = "green4",  # verde
-    "4" = "#d62728"   # rojo
-  )) 
+  scale_fill_manual(values = colores_clusters)
 
+# Media de días transcurridos por compra
 media_diasgf <- ggplot(media_dias, aes(x = cluster, 
-                                           y = media_de_dias_pasadas_por_compras,
-                                           fill = cluster)) +
+                                       y = media_de_dias_pasadas_por_compras,
+                                       fill = cluster)) +
   geom_col() +
-  labs(title = "Media de dias transcurridas por compra",
-       x = "clusteres", y = "media de dias") +
+  labs(title = "Media de días transcurridos por compra",
+       x = "Clusters", y = "Media de días") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c(
-    "1" = "steelblue",  # azul
-    "2" = "grey",  # naranja
-    "3" = "green4",  # verde
-    "4" = "#d62728"   # rojo
-  ))  
+  scale_fill_manual(values = colores_clusters)
 
+# Total de veces que han comprado
 total_comprasgf <- ggplot(total_compra, aes(x = cluster, 
-                           y = total_veces_que_ha_comprado,
-                           fill = cluster)) +
+                                            y = total_veces_que_ha_comprado,
+                                            fill = cluster)) +
   geom_col() +
   labs(title = "Total veces que han comprado",
-       x = "clusteres", y = "Total compras") +
+       x = "Clusters", y = "Total compras") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c(
-    "1" = "steelblue",  # azul
-    "2" = "grey",  # gris
-    "3" = "green4",  # verde
-    "4" = "#d62728"   # rojo
-  ))         
+  scale_fill_manual(values = colores_clusters)
+
 
 # Desactivar leyenda interna en cada gráfico
 media_unidades_gf_nolegend <- media_unidades_gf + theme(legend.position = "none")
@@ -294,3 +283,168 @@ final_plot <- plot_grid(
 
 print(final_plot)
 ggsave("Graficos/Analisis_exporatorio.png", plot = final_plot,width = 10, height = 6, dpi = 300) 
+
+
+
+# cargamos los datos
+tickets <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
+clusteres <- readRDS("Datos\\Transformados\\df_con_clusteres.rds")
+productos <- readRDS("Datos\\Originales\\maestroestr.RDS")
+
+# para poder hacer la matriz, añadimos la COLUMNA DE CLUSTERES al data frame original
+df <- left_join(tickets,clusteres,by="id_cliente_enc")
+df <- df[,-c(5,6,7)]  
+
+# por otro lado, agregamos una columna con el producto en general, y el producto en especifico
+# ------- PRODUCTO GENERAL
+df <- df %>%
+  mutate(
+    cod_est = as.character(cod_est),  # Asegura que tenga formato string
+    producto_general = case_when(
+      grepl("^010\\d+", cod_est) ~ "Fruta y verdura",
+      grepl("^0125\\d+", cod_est) ~ "Legumbres y frutos secos a granel",
+      grepl("^02\\d+", cod_est) ~ "Carniceria",
+      grepl("^03\\d+", cod_est) ~ "Congelados",
+      grepl("^04\\d+", cod_est) ~ "Charcuteria",
+      grepl("^050\\d+", cod_est) ~ "Lacteos",
+      grepl("^051\\d+", cod_est) ~ "Lacteos y postres",
+      grepl("^052\\d+", cod_est) ~ "Huevos y leche fresco",
+      grepl("^06\\d+", cod_est) ~ "Panaderia",
+      grepl("^07\\d+", cod_est) ~ "Carniceria",
+      grepl("^081\\d+", cod_est) ~ "Latas o mermeladas", 
+      grepl("^082\\d+", cod_est) ~ "Latas",
+      grepl("^083140\\d+", cod_est) ~ "Conservas",
+      grepl("^083145\\d+", cod_est) ~ "Alimentacion animales",
+      grepl("^0833\\d+", cod_est) ~ "Snacks",
+      grepl("^084\\d+", cod_est) ~ "Snacks",
+      grepl("^080\\d+", cod_est) ~ "Snacks",
+      grepl("^090\\d+", cod_est) ~ "Salsas y arroces/pastas",
+      grepl("^091\\d+", cod_est) ~ "Salsas y arroces/pastas", 
+      grepl("^092\\d+", cod_est) ~ "Frigorifico (sin productos de origen animal)",
+      grepl("^093\\d+", cod_est) ~ "Especies",
+      grepl("^10\\d+", cod_est) ~ "Panaderia",
+      grepl("^11\\d+", cod_est) ~ "Alcoholes",
+      grepl("^1213\\d+", cod_est) ~ "Higiene",
+      grepl("^13\\d+", cod_est) ~ "Higiene",
+      grepl("^14\\d+", cod_est) ~ "Platos preparados",
+      TRUE ~ "Otros"
+    )
+  )
+
+# ---------- PRODUCTO ESPECIFICO (del df maestrostr)
+df <- left_join(df,productos,by="cod_est")
+
+# ------------- PARA LA CARACTERIZACIÓN DE CLUSTERES
+productos_generales_menos_comprados <- df %>% 
+  group_by(cluster,producto_general) %>% 
+  summarise(cantidad_producto = n()) %>% 
+  slice_min(order_by = cantidad_producto, n = 5, with_ties = F)
+
+gf_productos_generales_menos_comprados<-ggplot(productos_generales_menos_comprados, aes(x = cantidad_producto, y = reorder(producto_general, cantidad_producto))) +
+  geom_segment(aes(x = 0, xend = cantidad_producto, yend = producto_general), color = "#0074B5",size= 1.5) +
+  geom_point(color =  "#E10A23", size = 5) +
+  facet_wrap(~ cluster, scales = "free_y") +
+  labs(
+    title = "Productos generales menos comprados por cluster",
+    x = "Cantidad",
+    y = "Productos generales"
+  ) +
+  theme_minimal()
+
+ggsave("Graficos/gf_productos_generales_menos_comprados.png", plot = gf_productos_generales_menos_comprados,width = 10, height = 6, dpi = 300) 
+
+
+
+productos_generales_mas_comprados <- df %>% 
+  group_by(cluster,producto_general) %>% 
+  summarise(cantidad_producto = n()) %>% 
+  slice_max(order_by = cantidad_producto, n = 5, with_ties = F)
+
+gf_productos_generales_mas_comprados<-ggplot(productos_generales_mas_comprados, aes(x = cantidad_producto, y = reorder(producto_general, cantidad_producto))) +
+  geom_segment(aes(x = 0, xend = cantidad_producto, yend = producto_general), color = "#0074B5",size= 1.5) +
+  geom_point(color =  "#E10A23", size = 5) +
+  facet_wrap(~ cluster, scales = "free_y") +
+  labs(
+    title = "Productos generales más comprados por cluster",
+    x = "Cantidad",
+    y = "Productos generales"
+  ) +
+  theme_minimal()
+
+ggsave("Graficos/gf_productos_generales_mas_comprados.png", plot = gf_productos_generales_mas_comprados,width = 10, height = 6, dpi = 300) 
+
+
+productos_menos_comprados <- df %>% 
+  group_by(cluster,descripcion) %>% 
+  summarise(cantidad_producto = n()) %>% 
+  slice_min(order_by = cantidad_producto, n = 5, with_ties = F)
+
+gf_productos_menos_comprados<-ggplot(productos_menos_comprados, aes(x = cantidad_producto, y = reorder(descripcion, cantidad_producto))) +
+  geom_segment(aes(x = 0, xend = cantidad_producto, yend = descripcion), color = "#0074B5",size= 1.5) +
+  geom_point(color =  "#E10A23", size = 5) +
+  facet_wrap(~ cluster, scales = "free_y") +
+  labs(
+    title = "Productos menos comprados por cluster",
+    x = "Cantidad",
+    y = "Productos"
+  ) +
+  theme_minimal()
+
+ggsave("Graficos/gf_productos_menos_comprados.png", plot = gf_productos_menos_comprados,width = 10, height = 6, dpi = 300) 
+
+
+productos_mas_comprados <- df %>% 
+  group_by(cluster,descripcion) %>% 
+  summarise(cantidad_producto = n()) %>% 
+  slice_max(order_by = cantidad_producto, n = 5, with_ties = F)
+
+gf_productos_mas_comprados<-ggplot(productos_mas_comprados, aes(x = cantidad_producto, y = reorder(descripcion, cantidad_producto))) +
+  geom_segment(aes(x = 0, xend = cantidad_producto, yend = descripcion), color = "#0074B5",size= 1.5) +
+  geom_point(color =  "#E10A23", size = 5) +
+  facet_wrap(~ cluster, scales = "free_y") +
+  labs(
+    title = "Productos más comprados por cluster",
+    x = "Cantidad",
+    y = "Productos"
+  ) +
+  theme_minimal()
+
+ggsave("Graficos/gf_productos_mas_comprados.png", plot = gf_productos_mas_comprados,width = 10, height = 6, dpi = 300) 
+
+
+
+top20_productos <- df %>%
+  count(descripcion, sort = TRUE) %>%
+  slice_max(n, n = 20) %>%
+  pull(descripcion)  # Vector con nombres
+
+productos_mas_comprados <- df %>% 
+  group_by(cluster,descripcion) %>% 
+  summarise(cantidad_producto = n())
+top20_cluster <- productos_mas_comprados %>%
+  filter(descripcion %in% top20_productos)
+
+top20prods_total_por_cluster<-ggplot(top20_cluster, aes(x = cantidad_producto, y = reorder(descripcion, cantidad_producto), fill = cluster)) +
+  geom_col(position = "stack") +
+  labs(
+    title = "Top 20 productos más vendidos y su distribución por cluster",
+    x = "Cantidad total",
+    y = "Producto"
+  ) +
+  scale_fill_manual(values = c("#E10A23",  "#F0928E", "#0074B5","#A2CBE8")) +
+  theme_minimal()
+
+ggsave("Graficos/top20prods_total_por_cluster.png", plot = top20prods_total_por_cluster,width = 10, height = 6, dpi = 300) 
+
+
+producto_mas_comprado <- df %>%
+  group_by(id_cliente_enc, producto_general,num_ticket) %>%
+  summarise(veces_comprado = n(), .groups = "drop") %>%
+  group_by(id_cliente_enc) %>%
+  slice_max(order_by = veces_comprado, n = 1, with_ties = FALSE)
+
+producto_mas_comprado <- producto_mas_comprado %>% 
+  select(id_cliente_enc,producto_general)
+
+
+
