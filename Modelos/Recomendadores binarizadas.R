@@ -254,18 +254,11 @@ saveRDS(resultados,"Datos\\Resultados\\comprobacion_objetivo2.rds")
 
 # ----------------------------------- OBJETIVO 3: 
 # las matrices de usuario e item son iguales que para el objetivo 2
-# recomendarle de 20 productos uno de ellos al usuario
-user_emb_obj3 <- user_emb[!rownames(user_emb) == "7776d22e65bc7a561b34457b4effb747",]
 
-scores <- user_emb %*% item_emb[, colnames(item_emb) %in% objetivos$objetivo3$obj]
-top_items_per_user <- apply(scores, 1, function(x) names(x)[which.max(x)])
-comprobacion_obj3 <- data.frame(
-  cliente = rownames(user_emb),
-  producto_recomendado = top_items_per_user
-)
 
-# elegimos 10 clientes para comprobar si anteriormente han comprado ese producto
-# que les ha recomendado el algoritmo
+# elegimos 1 producto de los 20 en oferta y calculamos los items mas parecidos, 
+# luego vemos si a los clientes que se les ha recomendado ese producto han comprado
+# anteriormente esos productos
 similarity <- t(item_emb[]) %*% item_emb[, colnames(item_emb) == "05030101", drop = F]
 
 # Asegúrate de que las filas de item_emb tienen nombres de ítems

@@ -105,13 +105,13 @@ algos <- list(
 
 # ----------- TOPNLIST
 
-eval <- evaluate(eval_scheme, algos, type = "topNList", n = c(1,3,5,10,15,20))
-saveRDS(eval,"Datos\\Resultados\\Comparando_algoritmos_topNlist_eval.rds")
-plot(eval) # a priori no hay mucha diferencia entre los algoritmos
+# eval <- evaluate(eval_scheme, algos, type = "topNList", n = c(1,3,5,10,15,20))
+# saveRDS(eval,"Datos\\Resultados\\Comparando_algoritmos_topNlist_eval.rds")
   
 # ---- SACAMOS PARAMETROS PARA COMPRAR ALGORITMOS: 
 # cargamos el eval
 eval <- readRDS("Datos\\Resultados\\Comparando_algoritmos_topNlist_eval.rds")
+plot(eval) 
 CM_Random <- getConfusionMatrix(eval[["random"]])[[1]]
 CM_UBCF_10 <- getConfusionMatrix(eval[["UBCF_10nn"]])[[1]]
 CM_UBCF_50 <- getConfusionMatrix(eval[["UBCF_5"]])[[1]]
@@ -122,8 +122,8 @@ CM_SVDF_40 <- getConfusionMatrix(eval[["svdf_40"]])[[1]]
 CM_ALS <- getConfusionMatrix(eval[["ALS"]]) [[1]]
 
 # ----------------- RATINGS
-eval_ratings <- evaluate(eval_scheme, algos, type = "ratings", n = c(1,3,5,10,15,20))
-saveRDS(eval_ratings,"Datos\\Resultados\\Comparando_algoritmos_ratings_eval.rds")
+#  eval_ratings <- evaluate(eval_scheme, algos, type = "ratings", n = c(1,3,5,10,15,20))
+# saveRDS(eval_ratings,"Datos\\Resultados\\Comparando_algoritmos_ratings_eval.rds")
 
 # --------------- SACAMOS PARAMETROS PARA COMPARAR ALGORITMOS: 
 # cargamos datos
