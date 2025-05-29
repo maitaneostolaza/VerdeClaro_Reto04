@@ -1,8 +1,5 @@
-library(plumber)
-library(dplyr)
-library(tidyr)
-library(readr)
-library(purrr)
+#Librerias
+source("../Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
 
 #* @apiTitle API de recomendación de productos
 #* @apiDescription Esta es una API que recomienda productos a clientes.<br><br>

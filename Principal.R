@@ -1,3 +1,9 @@
+##Antes de comenzar todos los scripts contienen este source, para llamar a todas
+## las librerias que contiene el proyecto, y caso de no tener alguna, la instala.
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
+rm(list=ls())
+
+
 #1 Preporcesamiento de datos 
 
 #1-1  Limpieza de datos Duplicados

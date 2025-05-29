@@ -1,12 +1,5 @@
-library(dplyr)
-library(stringr)
-library(tidyr)
-library(tidyverse)
-library(purrr)
-library(plotly)
-library(ggplot2)
-library(gridExtra)
-library(cowplot)
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
 
 # cargamos los datos ya limpios
 tickets <- readRDS("Datos\\Transformados\\tickets_limpios.rds")

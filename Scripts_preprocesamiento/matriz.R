@@ -1,7 +1,7 @@
 ################################# 
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
+
 
 
 ############################### CREACION MATRIZ ################################

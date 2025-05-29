@@ -14,7 +14,8 @@ mis_librerias <- c(
   "ggplot2", "dplyr", "tidyr", "stringr", "tidyverse", "purrr",
   "plotly", "naniar", "VIM", "lubridate", "rsparse", "shiny", "cowplot",
   "DT", "scales", "RColorBrewer", "gridExtra", "Matrix", "recommenderlab",
-  "tibble", "plumber", "readr", "reshape2", "rsparse"
+  "tibble", "plumber", "readr", "reshape2", "rsparse", "foreign", "arules",
+  "DT", "library(shinydashboard)"
 )
 
 usar_librerias(mis_librerias)

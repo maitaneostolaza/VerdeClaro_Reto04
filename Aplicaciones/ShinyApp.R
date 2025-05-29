@@ -1,15 +1,5 @@
-library(shiny)
-library(plotly)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-library(cowplot)
-library(purrr)
-library(DT)
-library(lubridate)
-library(recommenderlab)
-library(scales)
-library(shinydashboard)
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
 
 options(scipen = 999)
 

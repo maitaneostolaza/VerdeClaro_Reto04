@@ -1,11 +1,6 @@
 ########################## RECOMENDACIONES BINARIZADAS #########################
-library(rsparse)
-library(dplyr)
-library(tidyr)
-library(tibble)
-library(recommenderlab)
-library(dplyr)
-library(reshape2)
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
 
 tickets <- readRDS("Datos\\Transformados\\tickets_Reducidos.rds")
 objetivos <- readRDS("Datos\\Originales\\objetivos.RDS")

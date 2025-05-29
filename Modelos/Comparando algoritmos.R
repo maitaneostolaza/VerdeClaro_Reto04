@@ -1,7 +1,5 @@
-library(recommenderlab)
-library(dplyr)
-library(tidyr)
-library(Matrix)
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
 
 ################################## REDUCCION DE MATRIZ #########################
 # DESCARGAMOS LA MATRIZ
@@ -172,8 +170,7 @@ comparativa_errores <- data.frame(
 )
 
 #Graficarlo (RMSE,MSE,MAE)
-library(ggplot2)
-library(tidyr)  
+
 
 comparativa_larga <- pivot_longer(comparativa_errores,
                                   cols = c("RMSE", "MAE", "MSE"),
@@ -221,8 +218,7 @@ comparativa_errores <- data.frame(
 )
 
 #Graficarlo (RMSE,MSE,MAE)
-library(ggplot2)
-library(tidyr)  
+
 
 comparativa_larga <- pivot_longer(comparativa_errores,
                                   cols = c("RMSE", "MAE", "MSE"),
@@ -298,7 +294,6 @@ ggplot(df_roc_wide, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
 # -------------------- NOVEDAD: cuanto se diferencia del popular
 # Calcular la popularidad de cada ítem
 
-library(recommenderlab)
 
 # ---------------- FUNCIONES -----------------
 

@@ -1,12 +1,9 @@
 # ================================
 # CARGA DE LIBRERÍAS
 # ================================
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-library(lubridate)
-library(scales)
-library(RColorBrewer)
+
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
 
 # ================================
 # DEFINICIÓN DE PALETA DE COLORES

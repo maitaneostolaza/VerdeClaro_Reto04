@@ -1,5 +1,6 @@
-library(dplyr)
-library(tidyr)
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
+
 
 tickets <- readRDS("Datos\\Originales\\tickets_enc.RDS")
 productos <- readRDS("Datos\\Originales\\maestroestr.RDS")
@@ -28,7 +29,6 @@ compras <- compras %>%
     values_fill = list(presente = 0))
 
 
-library(foreign)
 codigos <- gsub("^X", "", colnames(compras))
 
 tabla_nombres <- data.frame(
@@ -45,7 +45,6 @@ nuevos_nombres <- ifelse(
 
 colnames(compras) <- nuevos_nombres
 
-library(arules)
 
 item_freq <- colSums(compras[,-1])
 productos_frecuentes <- names(item_freq[item_freq >= 100])
@@ -66,7 +65,6 @@ print(class(transacciones))
 summary(transacciones)
 inspect(head(transacciones, 5))
 
-library(arules)
 
 # Generar reglas de asociación
 reglas <- apriori(transacciones, parameter = list(

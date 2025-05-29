@@ -1,12 +1,6 @@
-library(dplyr)
-library(lubridate)
-library(stringr)
-library(tidyr)
-library(tidyverse)
-library(purrr)
-library(plotly)
-library(naniar)
-library(VIM)
+#Librerias
+source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
+
 # Cargamos los ficheros previamente limpios
 #Maestroestr <- readRDS("Datos\\Originales\\maestroestr.RDS")
 
