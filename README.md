@@ -7,7 +7,7 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 ├── Aplicaciones/                  # Aplicaciones ejecutables
 │   ├── Api.R                      # Código principal de la API con Plumber
 │   ├── EjecutarApi.R              # Script para lanzar la API localmente
-│   └── ShinyApp.R                 # Aplicación Shiny para visualización interactiva
+│   └── ShinyApp.R                 # Aplicación Shiny visualización interactiva
 │
 ├── Datos/
 │   ├── Originales/                # Datos originales entregados por EROSKI (.RDS)
@@ -24,14 +24,16 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 ├── Scripts_Estadisticos/          # Análisis descriptivo y exploratorio
 │   └── AnalisisDescriptivos.R
 │
-├── Scripts_preprocesamiento/      # Limpieza, reducción y clustering
+├── Scripts_preprocesamiento/      # Limpieza, reducción, librerias, Funciones y clustering
 │   ├── Limpieza de datos.R
 │   ├── Limpieza de datos Reduccion.R
 │   ├── Clustering.R
 │   ├── matriz.R
+│   ├── Funciones.R
 │   └── Librerias.R
 │
 ├── Principal.R                    # Script central de integración y ejecución
+├── .gitignore                     # Archivo para omitir archivos
 ├── RETO04_VerdeClaro_R.Rproj      # Archivo de proyecto RStudio
 └── README.md                      # Este documento
 ```
