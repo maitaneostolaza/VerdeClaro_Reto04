@@ -112,6 +112,7 @@ algos <- list(
 # cargamos el eval
 eval <- readRDS("Datos\\Resultados\\Comparando_algoritmos_topNlist_eval.rds")
 plot(eval) 
+Save_pdf("GraficoModelos_TRP_FPR", quote(plot(eval)))
 CM_Random <- getConfusionMatrix(eval[["random"]])[[1]]
 CM_UBCF_10 <- getConfusionMatrix(eval[["UBCF_10nn"]])[[1]]
 CM_UBCF_50 <- getConfusionMatrix(eval[["UBCF_5"]])[[1]]
