@@ -4,69 +4,69 @@ source("Scripts_preprocesamiento/Funciones.R", encoding = "UTF-8")
 
 ################################## REDUCCION DE MATRIZ #########################
 # DESCARGAMOS LA MATRIZ
-matriz_general <- readRDS("Datos\\Resultados\\Matriz.rds")
-rownames(matriz_general) <- matriz_general[,1]
-matriz_general <- matriz_general[,-1]
-storage.mode(matriz_general) <- "numeric"
-matriz_sparse <- as(as.matrix(matriz_general), "dgCMatrix")
-matriz_rec <- as(matriz_sparse, "realRatingMatrix")
-
-
-dim(matriz_rec)
-summary(colSums(matriz_general, na.rm=T))
-hist(colSums(matriz_general,na.rm=T))
-hist(rowSums(matriz_general,na.rm=T))
-
-# sacamos estadisticos
-colCounts(matriz_rec) %>% 
-  as("matrix") 
-hist(getRatings(matriz_rec))
-recuentoF <- rowCounts(matriz_rec) # cuantas celditas de una fila son diferentes de NA (cuantas pelis ha valorado cada usuario)
-recuentoC <- mean(colCounts(matriz_rec))
-
-# convertimos a data frame para que podamos convertir la columna cliente_id a nombres de fila
-df <- as.data.frame(matriz_general)
-rownames(df) <- df$id_cliente_enc
-df <- df[,-1]
-# matriz_general <- as(df, "matrix")
-# matriz_rec <- as(matriz_general,"realRatingMatrix")
-
-# como no nos deja convertirlo a matriz, vamos a filtrar directamente el data frame: 
-# 1. SACAMOS ESTADISTICOS 
-df_numeric <- as.data.frame(lapply(df, function(x) as.numeric(as.character(x))))
-rownames(df_numeric) <- rownames(df)
-
-# Total de productos comprados por cada cliente
-compras_por_cliente <- rowSums(df_numeric, na.rm = TRUE)
-media_clientes <- mean(compras_por_cliente) #104.4187
-max(compras_por_cliente) # 1919
-min(compras_por_cliente) # 1
-
-# Total de veces que se compró cada producto (columnas)
-compras_por_producto <- colSums(df_numeric, na.rm = TRUE)
-media_productos <- mean(compras_por_producto) #1409.497
-min(compras_por_producto) # 1
-max(compras_por_producto) #22228
-
-# ------------------------- FILTRAMOS = REDUCIMOS
-# filtramos df porque minimo los clientes hayan comprado la media de compras por cliente
-# y los productos porque minimo hayan comprado la media de compras por producto
-# ---------- CLIENTES
-clientes_validos <- compras_por_cliente >= 120
-df_reducido_clien <- df_numeric[clientes_validos, ]
-
-# Recalcular compras por producto tras filtrar clientes
-compras_por_producto_filtrado <- colSums(df_reducido_clien, na.rm = TRUE)
-
-#---------- PRODUCTOS
-productos_validos <- compras_por_producto_filtrado >= 1000
-df_reducido <- df_reducido_clien[, productos_validos]
-dim(df_reducido)
-
-
-# ahora si, convertimos a matriz
-matriz <- as.matrix(df_reducido)
-saveRDS(matriz,"Datos/Resultados/Matriz_red_comp_algos.rds")
+# matriz_general <- readRDS("Datos\\Resultados\\Matriz.rds")
+# rownames(matriz_general) <- matriz_general[,1]
+# matriz_general <- matriz_general[,-1]
+# storage.mode(matriz_general) <- "numeric"
+# matriz_sparse <- as(as.matrix(matriz_general), "dgCMatrix")
+# matriz_rec <- as(matriz_sparse, "realRatingMatrix")
+# 
+# 
+# dim(matriz_rec)
+# summary(colSums(matriz_general, na.rm=T))
+# hist(colSums(matriz_general,na.rm=T))
+# hist(rowSums(matriz_general,na.rm=T))
+# 
+# # sacamos estadisticos
+# colCounts(matriz_rec) %>% 
+#   as("matrix") 
+# hist(getRatings(matriz_rec))
+# recuentoF <- rowCounts(matriz_rec) # cuantas celditas de una fila son diferentes de NA (cuantas pelis ha valorado cada usuario)
+# recuentoC <- mean(colCounts(matriz_rec))
+# 
+# # convertimos a data frame para que podamos convertir la columna cliente_id a nombres de fila
+# df <- as.data.frame(matriz_general)
+# rownames(df) <- df$id_cliente_enc
+# df <- df[,-1]
+# # matriz_general <- as(df, "matrix")
+# # matriz_rec <- as(matriz_general,"realRatingMatrix")
+# 
+# # como no nos deja convertirlo a matriz, vamos a filtrar directamente el data frame: 
+# # 1. SACAMOS ESTADISTICOS 
+# df_numeric <- as.data.frame(lapply(df, function(x) as.numeric(as.character(x))))
+# rownames(df_numeric) <- rownames(df)
+# 
+# # Total de productos comprados por cada cliente
+# compras_por_cliente <- rowSums(df_numeric, na.rm = TRUE)
+# media_clientes <- mean(compras_por_cliente) #104.4187
+# max(compras_por_cliente) # 1919
+# min(compras_por_cliente) # 1
+# 
+# # Total de veces que se compró cada producto (columnas)
+# compras_por_producto <- colSums(df_numeric, na.rm = TRUE)
+# media_productos <- mean(compras_por_producto) #1409.497
+# min(compras_por_producto) # 1
+# max(compras_por_producto) #22228
+# 
+# # ------------------------- FILTRAMOS = REDUCIMOS
+# # filtramos df porque minimo los clientes hayan comprado la media de compras por cliente
+# # y los productos porque minimo hayan comprado la media de compras por producto
+# # ---------- CLIENTES
+# clientes_validos <- compras_por_cliente >= 120
+# df_reducido_clien <- df_numeric[clientes_validos, ]
+# 
+# # Recalcular compras por producto tras filtrar clientes
+# compras_por_producto_filtrado <- colSums(df_reducido_clien, na.rm = TRUE)
+# 
+# #---------- PRODUCTOS
+# productos_validos <- compras_por_producto_filtrado >= 1000
+# df_reducido <- df_reducido_clien[, productos_validos]
+# dim(df_reducido)
+# 
+# 
+# # ahora si, convertimos a matriz
+# matriz <- as.matrix(df_reducido)
+# saveRDS(matriz,"Datos/Resultados/Matriz_red_comp_algos.rds")
 
 
 ########################## COMPARACION ALGORITMOS ##############################
