@@ -1,5 +1,6 @@
 #Librerias
 source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Funciones.R", encoding = "UTF-8")
 
 ################################## REDUCCION DE MATRIZ #########################
 # DESCARGAMOS LA MATRIZ
@@ -177,7 +178,7 @@ comparativa_larga <- pivot_longer(comparativa_errores,
                                   names_to = "Metrica",
                                   values_to = "Valor")
 
-
+Save_pdf("Comparacion_Error_Ratings", quote({
 ggplot(comparativa_larga, aes(x = Modelo, y = Valor, fill = Metrica)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
   labs(title = "Comparación de errores por modelo (Ratings)",
@@ -187,7 +188,7 @@ ggplot(comparativa_larga, aes(x = Modelo, y = Valor, fill = Metrica)) +
   theme_minimal(base_size = 14) +
   scale_fill_manual(values = c("RMSE" = "#B00A1C", "MAE" = "#005B92", "MSE" = "#FFD5D1")) +
   theme(legend.position = "top")
-
+}))
 
 
 
@@ -225,7 +226,7 @@ comparativa_larga <- pivot_longer(comparativa_errores,
                                   names_to = "Metrica",
                                   values_to = "Valor")
 
-
+Save_pdf("Comparacion_Error_ratings2", quote({
 ggplot(comparativa_larga, aes(x = Modelo, y = Valor, fill = Metrica)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
   labs(title = "Comparación de errores por modelo (Ratings)",
@@ -235,7 +236,7 @@ ggplot(comparativa_larga, aes(x = Modelo, y = Valor, fill = Metrica)) +
   theme_minimal(base_size = 14) +
   scale_fill_manual(values = c("RMSE" = "#B00A1C", "MAE" = "#005B92", "MSE" = "#FFD5D1")) +
   theme(legend.position = "top")
-
+}))
 
 # ----------------------------------------- TOP N LIST
 # Obtener matriz de confusión para n=5 de cada algoritmo
@@ -279,6 +280,7 @@ df_roc_wide <- df_roc %>%
   pivot_wider(names_from = Metrica, values_from = Valor)
 
 # 4. Graficar la curva ROC: TPR vs FPR por modelo, conectando puntos en orden de 'Paso'
+Save_pdf("CurvaRoc_TPR_vs_FPR", quote({
 ggplot(df_roc_wide, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
@@ -288,7 +290,7 @@ ggplot(df_roc_wide, aes(x = fpr, y = tpr, color = Modelo, group = Modelo)) +
        color = "Modelo") +
   theme_minimal(base_size = 14) +
   theme(legend.position = "top")
-
+}))
 
 ############################### NOVELTY Y COVERAGE #############################
 # -------------------- NOVEDAD: cuanto se diferencia del popular

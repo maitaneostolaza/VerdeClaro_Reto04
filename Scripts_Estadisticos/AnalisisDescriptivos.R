@@ -4,6 +4,7 @@
 
 #Librerias
 source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Funciones.R", encoding = "UTF-8")
 
 # ================================
 # DEFINICIÓN DE PALETA DE COLORES
@@ -41,6 +42,8 @@ datos_enriquecidos <- left_join(datos, maestroestr, by = "cod_est")
 # ================================
 
 # Top 10 productos más vendidos
+Save_pdf("top_10_productos", quote({
+
 datos_enriquecidos %>%
   count(descripcion, sort = TRUE) %>%
   slice_max(n, n = 10) %>%
@@ -49,8 +52,11 @@ datos_enriquecidos %>%
   coord_flip() +
   labs(title = "Top 10 productos más vendidos", x = "Producto") +
   theme_minimal()
+}))
+
 
 # Tickets por día
+Save_pdf("Numero_Tickets_Dia", quote({
 datos %>%
   group_by(fecha) %>%
   summarise(tickets = n_distinct(ticket)) %>%
@@ -58,7 +64,7 @@ datos %>%
   geom_line(color = eroski_palette_extended[5]) +
   labs(title = "Número de tickets por día", x = "Fecha", y = "Tickets") +
   theme_minimal()
-
+}))
 # Productos vendidos por día de la semana
 datos <- datos %>%
   mutate(
@@ -71,6 +77,7 @@ ventas_por_dia <- datos %>%
   filter(dia_semana != "domingo") %>%
   count(dia_semana)
 
+Save_pdf("Productos_Vendidos_Dia", quote({
 ggplot(ventas_por_dia, aes(x = dia_semana, y = n)) +
   geom_bar(stat = "identity", fill = eroski_palette_extended[7]) +
   labs(
@@ -80,6 +87,7 @@ ggplot(ventas_por_dia, aes(x = dia_semana, y = n)) +
   ) +
   scale_y_continuous(labels = label_comma()) +
   theme_minimal()
+}))
 
 # Productos vendidos por semana
 datos <- datos %>%
@@ -91,6 +99,7 @@ ventas_por_semana <- datos %>%
 
 options(scipen = 999)
 
+Save_pdf("Productos_Vendidos_Semana", quote({
 ggplot(ventas_por_semana, aes(x = semana, y = n)) +
   geom_bar(stat = "identity", fill = eroski_palette_extended[7], color = eroski_palette_extended[6]) +
   labs(
@@ -100,6 +109,7 @@ ggplot(ventas_por_semana, aes(x = semana, y = n)) +
   ) +
   theme_minimal() +
   scale_x_date(labels = date_format("%U"), breaks = "1 week")
+}))
 
 # Top 10 clientes con más unidades compradas
 compras_por_cliente <- datos %>%
@@ -108,13 +118,14 @@ compras_por_cliente <- datos %>%
 
 top_10 <- compras_por_cliente %>% slice_head(n = 10)
 
+Save_pdf("Top_10_compradores", quote({
 ggplot(top_10, aes(x = reorder(id_cliente, productos_comprados), y = productos_comprados)) +
   geom_bar(stat = "identity", fill = eroski_palette_extended[2]) +
   coord_flip() +
   labs(title = "Top 10 clientes que más unidades compran",
        x = "ID Cliente", y = "Productos comprados") +
   theme_minimal()
-
+}))
 # ================================
 # ANÁLISIS CON CLÚSTERES Y CATEGORÍAS
 # ================================
@@ -173,6 +184,7 @@ top5_dia <- ventas_dia_producto %>%
   slice_max(order_by = cantidad_vendida, n = 5) %>%
   ungroup()
 
+Save_pdf("Top5_vendidos_dia", quote({
 ggplot(top5_dia, aes(x = dia_semana, y = cantidad_vendida, fill = producto_general)) +
   geom_col() +
   coord_flip() +
@@ -185,3 +197,4 @@ ggplot(top5_dia, aes(x = dia_semana, y = cantidad_vendida, fill = producto_gener
   scale_fill_manual(values = eroski_palette_extended) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}))

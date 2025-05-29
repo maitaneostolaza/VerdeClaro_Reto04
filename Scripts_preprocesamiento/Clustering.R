@@ -1,5 +1,6 @@
 #Librerias
 source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Funciones.R", encoding = "UTF-8")
 
 # cargamos los datos ya limpios
 tickets <- readRDS("Datos\\Transformados\\tickets_limpios.rds")
@@ -231,6 +232,8 @@ media_unidades_gf <- ggplot(media_unidades, aes(x = cluster,
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_manual(values = colores_clusters)
 
+Save_pdf("media_unidades_por_compra", quote(media_unidades_gf))
+
 # Media de días transcurridos por compra
 media_diasgf <- ggplot(media_dias, aes(x = cluster, 
                                        y = media_de_dias_pasadas_por_compras,
@@ -241,6 +244,7 @@ media_diasgf <- ggplot(media_dias, aes(x = cluster,
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_manual(values = colores_clusters)
+Save_pdf("media_dias_transcurridos_compra", quote(media_diasgf))
 
 # Total de veces que han comprado
 total_comprasgf <- ggplot(total_compra, aes(x = cluster, 
@@ -252,7 +256,7 @@ total_comprasgf <- ggplot(total_compra, aes(x = cluster,
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_manual(values = colores_clusters)
-
+Save_pdf("Total_compras_cliente", quote(total_comprasgf))
 
 # Desactivar leyenda interna en cada gráfico
 media_unidades_gf_nolegend <- media_unidades_gf + theme(legend.position = "none")
