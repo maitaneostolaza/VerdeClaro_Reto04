@@ -13,16 +13,16 @@ source("Scripts_preprocesamiento/Limpieza de datos.R", encoding = "UTF-8")
 rm(list=ls())
 
 
-#1-2 Limpieza de datos Reduccion de dataset
+#1-2 Clustering
 #
-source("Scripts_preprocesamiento/Limpieza de datos Reduccion.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Clustering.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
 
-#1-3  Clustering
+#1-3  Limpieza de datos Reduccion de dataset
 #
-source("Scripts_preprocesamiento/Clustering.R", encoding = "UTF-8")
+source("Scripts_preprocesamiento/Limpieza de datos Reduccion.R", encoding = "UTF-8")
 #
 rm(list=ls())
 
