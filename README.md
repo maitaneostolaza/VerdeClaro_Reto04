@@ -38,6 +38,19 @@ Este repositorio contiene todo el trabajo desarrollado durante el Reto 4, centra
 └── README.md                      # Este documento
 ```
 
+---
+
+💻 Cómo descargar el proyecto en tu equipo
+
+Si quieres probar el proyecto en tu propio ordenador, puedes clonar este repositorio desde GitHub. 
+### 👉 Pasos:
+
+1. Abre una terminal o consola (por ejemplo, Git Bash en Windows).
+2. Ejecuta el siguiente comando para clonar el repositorio:
+
+```
+git clone https://github.com/maitaneostolaza/VerdeClaro_Reto04
+```
 
 ---
 
@@ -98,3 +111,5 @@ A continuación, te explicamos cómo funciona cada una:
 2. Pulsa **“Try it out”**.  
 3. Introduce un `cliente_id` del objetivo 4.  
 4. Pulsa **“Execute”** y obtendrás el **producto olvidado** (si lo hay).
+
+
