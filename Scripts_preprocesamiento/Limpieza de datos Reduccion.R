@@ -17,7 +17,7 @@ source("Scripts_preprocesamiento/Librerias.R", encoding = "UTF-8")
 
 
 # --- PRIMER FILTRO: cod_est ---
-data <- readRDS("Datos/Transformados/tickets_enc.rds")
+data <- readRDS("Datos/Originales/tickets_enc.rds")
 
 # 1. Filtrar productos fuera del rango intercuartílico
 conteo_cod <- data %>%
